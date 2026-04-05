@@ -86,6 +86,31 @@ export default function BenefitsSection() {
             </Card>
           ))}
         </div>
+
+        {/* Quranic Verse Card */}
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-primary/5 p-8 sm:p-12">
+          {/* Decorative Quote Marks */}
+          <div className="absolute top-4 left-6 text-8xl font-serif text-primary/10 leading-none select-none">
+            &ldquo;
+          </div>
+          <div className="absolute bottom-4 right-6 text-8xl font-serif text-primary/10 leading-none select-none">
+            &rdquo;
+          </div>
+
+          <div className="relative text-center space-y-4 max-w-3xl mx-auto">
+            <BookOpen className="h-6 w-6 text-primary mx-auto" />
+            <blockquote className="text-xl sm:text-2xl lg:text-3xl font-medium leading-relaxed tracking-tight text-foreground">
+              And whoever saves one life — it is as if he had saved mankind entirely.
+            </blockquote>
+            <cite className="block text-sm sm:text-base text-primary font-semibold not-italic">
+              — Al-Quran, Surah Al-Ma&apos;idah (5:32)
+            </cite>
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+              In Islam, saving a life is considered one of the greatest acts of virtue.
+              Blood donation is a simple yet profound way to fulfill this sacred duty.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,17 +1,9 @@
-import HeroCarousel from "../components/home/HeroCarousel";
-import MotivationalSlider from "../components/home/MotivationalSlider";
-import EmergencyRequests from "../components/home/EmergencyRequests";
-import BenefitsSection from "../components/home/BenefitsSection";
-import HowItWorksSection from "../components/home/HowItWorksSection";
+import { FeedContainer } from "../features/feed/FeedContainer";
 
-export default function HomePage() {
+export default function RootPage() {
   return (
-    <main>
-      <HeroCarousel />
-      <MotivationalSlider />
-      <EmergencyRequests />
-      <BenefitsSection />
-      <HowItWorksSection />
+    <main className="min-h-screen bg-background">
+      <FeedContainer />
     </main>
   );
 }

@@ -30,7 +30,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
     <QueryProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="dark"
+        defaultTheme="light"
         enableSystem
         disableTransitionOnChange
       >

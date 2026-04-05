@@ -6,7 +6,7 @@ import Navbar from "../components/shared/Navbar";
 import Footer from "../components/shared/Footer";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: {
@@ -27,7 +27,9 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased">
         <AppProviders>
           <Navbar />
-          <div className="flex-1">{children}</div>
+          <div className="flex-1">
+            {children}
+          </div>
           <Footer />
         </AppProviders>
       </body>
