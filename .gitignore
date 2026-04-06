@@ -43,6 +43,7 @@ next-env.d.ts
 
 # AI / IDE files
 .brainsync
+.bsync_core
 .agent
 .agent-mem
 .agents
