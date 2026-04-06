@@ -23,9 +23,9 @@ const baseFields = {
   password: z
     .string()
     .min(6, "Password must be at least 6 characters"),
-  division: z.string().optional(),
-  district: z.string().optional(),
-  upazila: z.string().optional(),
+  division: z.string().min(1, "Division is required"),
+  district: z.string().min(1, "District is required"),
+  upazila: z.string().min(1, "Upazila is required"),
 };
 
 export const registerSchema = z.discriminatedUnion("role", [
@@ -42,7 +42,7 @@ export const registerSchema = z.discriminatedUnion("role", [
     ...baseFields,
     role: z.literal("HOSPITAL"),
     registrationNumber: z.string().optional(),
-    address: z.string().min(1, "Address is required"),
+    address: z.string().optional(),
   }),
   z.object({
     ...baseFields,
@@ -54,3 +54,17 @@ export const registerSchema = z.discriminatedUnion("role", [
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+// ---------- Forgot Password Schema ----------
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Enter a valid email address").min(1, "Email is required"),
+});
+
+// ---------- Reset Password Schema ----------
+export const resetPasswordSchema = z.object({
+  token: z.string().min(6, "OTP must be at least 6 characters").max(6, "OTP must be exactly 6 characters"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

@@ -72,3 +72,15 @@ export const logoutApi = async (): Promise<void> => {
     removeAccessToken();
   }
 };
+
+// ---------- Forgot Password ----------
+export const forgotPasswordApi = async (email: string): Promise<any> => {
+  const response = await axiosInstance.post("/auth/forgot-password", { email });
+  return response.data;
+};
+
+// ---------- Reset Password ----------
+export const resetPasswordApi = async (payload: { id: string; token: string; newPassword: string }): Promise<any> => {
+  const response = await axiosInstance.post("/auth/reset-password", payload);
+  return response.data;
+};

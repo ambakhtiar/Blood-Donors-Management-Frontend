@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, Geist } from "next/font/google";
 import "./globals.css";
-import AppProviders from "../providers/AppProviders";
-import Navbar from "../components/shared/Navbar";
-import Footer from "../components/shared/Footer";
-import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
+import AppProviders from "@/providers/AppProviders";
+
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: {
@@ -26,10 +27,9 @@ export default function RootLayout({
     <html lang="en" className={cn("h-full", "font-sans", geist.variable)} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col antialiased">
         <AppProviders>
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <Footer />
+          {children}
         </AppProviders>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

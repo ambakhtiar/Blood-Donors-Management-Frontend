@@ -11,6 +11,7 @@ import { setAccessToken } from "@/lib/axiosInstance";
 import { fetchCurrentUser } from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/providers/AuthProvider";
+import Link from "next/link";
 
 const inputClass =
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
@@ -93,9 +94,17 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium leading-none">
-          Password <span className="text-destructive">*</span>
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium leading-none">
+            Password <span className="text-destructive">*</span>
+          </label>
+          <Link
+            href="/auth/forgot-password"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
         <input
           type="password"
           placeholder="••••••••"

@@ -79,10 +79,10 @@ export function RegisterForm() {
       email: form.email,
       contactNumber,
       password: form.password,
+      division: form.division,
+      district: form.district,
+      upazila: form.upazila,
     };
-    if (form.division) base.division = form.division;
-    if (form.district) base.district = form.district;
-    if (form.upazila) base.upazila = form.upazila;
 
     if (form.role === "USER") {
       base.bloodGroup = form.bloodGroup;
@@ -94,6 +94,8 @@ export function RegisterForm() {
       if (form.registrationNumber) base.registrationNumber = form.registrationNumber;
       if (form.establishedYear) base.establishedYear = form.establishedYear;
     }
+
+    console.log(base);
     return base;
   };
 
@@ -136,10 +138,21 @@ export function RegisterForm() {
   const mutation = useMutation({
     mutationFn: async (payload: RegisterFormValues) => {
       await registerApi(payload);
+      
+      if (payload.role === "HOSPITAL" || payload.role === "ORGANISATION") {
+        return { needsApproval: true };
+      }
+      
       const emailOrPhone = 'email' in payload && payload.email ? payload.email : payload.contactNumber;
       return loginApi({ emailOrPhone, password: payload.password });
     },
-    onSuccess: async (data: any) => {
+    onSuccess: async (data: any, originalPayload: RegisterFormValues) => {
+      if (data?.needsApproval) {
+        toast.success("Account created successfully! Admin approval is required.");
+        router.push("/auth/login");
+        return;
+      }
+
       if (data?.data?.accessToken) setAccessToken(data.data.accessToken);
       try {
         const user = await fetchCurrentUser();
@@ -149,7 +162,8 @@ export function RegisterForm() {
       router.push("/");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Registration failed.");
+      const message = error.response?.data?.message || error.response?.data?.errorDetails?.message || "Registration failed. User might already exist.";
+      toast.error(message);
     },
   });
 
@@ -215,7 +229,14 @@ export function RegisterForm() {
               placeholder="1XXXXXXXXX"
               value={form.phone}
               onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                let digits = e.target.value.replace(/\D/g, "");
+                if (digits.startsWith("880")) digits = digits.substring(3);
+                else if (digits.startsWith("88")) digits = digits.substring(2);
+                else if (digits.startsWith("8")) digits = digits.substring(1);
+
+                if (digits.startsWith("0")) digits = digits.substring(1);
+
+                digits = digits.slice(0, 10);
                 handleChange("phone", digits);
               }}
               onBlur={() => handleBlur("phone")}
@@ -292,7 +313,7 @@ export function RegisterForm() {
               <input type="text" placeholder="REG-XXXX" value={form.registrationNumber} onChange={(e) => handleChange("registrationNumber", e.target.value)} className={inputClass} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Full Address<RequiredMark /></label>
+              <label className="text-sm font-medium">Full Address</label>
               <input type="text" placeholder="123 Hospital Road, Dhaka" value={form.address} onChange={(e) => handleChange("address", e.target.value)} onBlur={() => handleBlur("address")} className={inputClass} />
               {touched.address && errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
             </div>
@@ -314,29 +335,32 @@ export function RegisterForm() {
         )}
 
         {/* ===== Location Section ===== */}
-        <div className="space-y-4 sm:col-span-2 border-t pt-4 mt-1">
-          <p className="text-sm font-medium text-muted-foreground">Location (Optional)</p>
+        <div className="space-y-1 sm:col-span-2 border-t pt-2 mt-1">
+          <p className="text-sm font-medium font-medium">Location <RequiredMark /></p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Division</label>
-              <select value={form.division} onChange={(e) => handleChange("division", e.target.value)} className={selectClass}>
+              <label className="text-xs font-medium text-muted-foreground">Division <RequiredMark /></label>
+              <select value={form.division} onChange={(e) => handleChange("division", e.target.value)} onBlur={() => handleBlur("division")} className={selectClass}>
                 <option value="">Select Division</option>
                 {divisions.map((d) => (<option key={d} value={d}>{d}</option>))}
               </select>
+              {touched.division && errors.division && <p className="text-xs text-destructive">{errors.division}</p>}
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">District</label>
-              <select value={form.district} onChange={(e) => handleChange("district", e.target.value)} disabled={!form.division} className={selectClass}>
+              <label className="text-xs font-medium text-muted-foreground">District <RequiredMark /></label>
+              <select value={form.district} onChange={(e) => handleChange("district", e.target.value)} disabled={!form.division} onBlur={() => handleBlur("district")} className={selectClass}>
                 <option value="">Select District</option>
                 {districts.map((d) => (<option key={d} value={d}>{d}</option>))}
               </select>
+              {touched.district && errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Upazila</label>
-              <select value={form.upazila} onChange={(e) => handleChange("upazila", e.target.value)} disabled={!form.district} className={selectClass}>
+              <label className="text-xs font-medium text-muted-foreground">Upazila <RequiredMark /></label>
+              <select value={form.upazila} onChange={(e) => handleChange("upazila", e.target.value)} disabled={!form.district} onBlur={() => handleBlur("upazila")} className={selectClass}>
                 <option value="">Select Upazila</option>
                 {upazilas.map((u) => (<option key={u} value={u}>{u}</option>))}
               </select>
+              {touched.upazila && errors.upazila && <p className="text-xs text-destructive">{errors.upazila}</p>}
             </div>
           </div>
         </div>
