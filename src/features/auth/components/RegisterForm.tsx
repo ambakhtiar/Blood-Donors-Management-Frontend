@@ -94,8 +94,6 @@ export function RegisterForm() {
       if (form.registrationNumber) base.registrationNumber = form.registrationNumber;
       if (form.establishedYear) base.establishedYear = form.establishedYear;
     }
-
-    console.log(base);
     return base;
   };
 
@@ -313,7 +311,7 @@ export function RegisterForm() {
               <input type="text" placeholder="REG-XXXX" value={form.registrationNumber} onChange={(e) => handleChange("registrationNumber", e.target.value)} className={inputClass} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Full Address</label>
+              <label className="text-sm font-medium">Full Address<RequiredMark /></label>
               <input type="text" placeholder="123 Hospital Road, Dhaka" value={form.address} onChange={(e) => handleChange("address", e.target.value)} onBlur={() => handleBlur("address")} className={inputClass} />
               {touched.address && errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
             </div>
@@ -336,7 +334,7 @@ export function RegisterForm() {
 
         {/* ===== Location Section ===== */}
         <div className="space-y-1 sm:col-span-2 border-t pt-2 mt-1">
-          <p className="text-sm font-medium font-medium">Location <RequiredMark /></p>
+          <p className="text-sm font-medium">Location <RequiredMark /></p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Division <RequiredMark /></label>

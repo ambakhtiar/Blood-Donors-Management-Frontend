@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Droplets, Clock, AlertTriangle, Heart, MessageCircle, Share2, Activity } from "lucide-react";
+import { MapPin, Droplets, Clock, AlertTriangle, Heart, MessageCircle, Activity } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface PostCardProps {
@@ -112,10 +112,6 @@ export function PostCard({ post }: PostCardProps) {
         <Button variant="ghost" size="sm" className="flex-1 rounded-none hover:bg-primary/5 hover:text-primary transition-colors">
           <MessageCircle className="w-4 h-4 mr-2" />
           <span className="hidden sm:inline">Comment</span>
-        </Button>
-        <Button variant="ghost" size="sm" className="flex-1 rounded-none hover:bg-primary/5 hover:text-primary transition-colors">
-          <Share2 className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">Share</span>
         </Button>
       </CardFooter>
     </Card>

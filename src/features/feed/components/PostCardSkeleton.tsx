@@ -18,7 +18,7 @@ export function PostCardSkeleton() {
           <Skeleton className="h-4 w-5/6" />
           <Skeleton className="h-4 w-2/3" />
         </div>
-        
+
         {/* Grid data */}
         <div className="grid grid-cols-2 gap-4 mt-4">
           <Skeleton className="h-10 w-full rounded-md" />
@@ -28,7 +28,6 @@ export function PostCardSkeleton() {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between border-t p-4">
-        <Skeleton className="h-8 w-1/4 rounded-md" />
         <Skeleton className="h-8 w-1/4 rounded-md" />
         <Skeleton className="h-8 w-1/4 rounded-md" />
       </CardFooter>
