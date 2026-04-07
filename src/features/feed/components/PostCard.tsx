@@ -3,14 +3,19 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Droplets, Clock, AlertTriangle, Heart, MessageCircle, Activity } from "lucide-react";
+import { MapPin, Droplets, Clock, AlertTriangle, MessageCircle, Activity, Heart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { LikeAction } from "./LikeAction";
+import { PostDetailsDrawer } from "./PostDetailsDrawer";
+import { useState } from "react";
 
 interface PostCardProps {
   post: any;
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   // Extract correct author name based on role
   const authorName =
     post.author?.donorProfile?.name ||
@@ -133,15 +138,20 @@ export function PostCard({ post }: PostCardProps) {
       </CardContent>
 
       <CardFooter className="flex justify-between border-t border-primary/5 p-1 bg-secondary/10">
-        <Button variant="ghost" size="sm" className="flex-1 rounded-none hover:bg-primary/5 hover:text-primary transition-all group py-5">
-          <Heart className="w-4 h-4 mr-2 group-hover:fill-primary transition-colors" />
-          <div className="flex items-baseline gap-1">
-            <span className="font-bold">{post._count?.likes || 0}</span>
-            <span className="text-xs text-muted-foreground hidden sm:inline">Likes</span>
-          </div>
-        </Button>
+        <LikeAction
+          postId={post.id}
+          initialLikes={post._count?.likes || 0}
+          initialHasLiked={post.hasLiked}
+        />
+
         <div className="w-[1px] bg-primary/10 h-6 self-center" />
-        <Button variant="ghost" size="sm" className="flex-1 rounded-none hover:bg-primary/5 hover:text-primary transition-all group py-5">
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsDrawerOpen(true)}
+          className="flex-1 rounded-none hover:bg-primary/5 hover:text-primary transition-all group py-5"
+        >
           <MessageCircle className="w-4 h-4 mr-2 group-hover:fill-primary transition-colors" />
           <div className="flex items-baseline gap-1">
             <span className="font-bold">{post._count?.comments || 0}</span>
@@ -149,6 +159,14 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         </Button>
       </CardFooter>
+
+      {/* Engagement Drawer */}
+      <PostDetailsDrawer
+        post={post}
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        authorName={authorName}
+      />
     </Card>
   );
 }
