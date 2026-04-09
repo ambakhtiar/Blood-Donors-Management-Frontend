@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Plus, X, AlertTriangle, Clock, Heart, HandHelping } from "lucide-react";
+import { Loader2, Plus, X, AlertTriangle, Clock, Heart, HandHelping, MapPin } from "lucide-react";
 import { createPostSchema, type CreatePostFormValues } from "@/validations/post.validation";
 import { createPost } from "@/services/post.service";
 import { getDivisions, getDistricts, getUpazilas } from "@/lib/bd-location";
@@ -259,7 +259,7 @@ export function CreatePostForm() {
     onSuccess: () => {
       toast.success("Post created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      router.push("/");
+      router.push("/feed");
     },
     onError: (error: any) => {
       const message =
@@ -273,7 +273,14 @@ export function CreatePostForm() {
   // ── Submit ───────────────────────────────────────────────────────────────
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = buildPayload();
+    
+    // Auto-append pending image URL if exists
+    let finalImages = [...form.images];
+    if (newImageUrl.trim() && finalImages.length < MAX_IMAGES) {
+      finalImages.push(newImageUrl.trim());
+    }
+
+    const payload = { ...buildPayload(), images: finalImages.filter(url => url.trim() !== "") };
     const result = createPostSchema.safeParse(payload);
 
     if (!result.success) {
@@ -353,7 +360,9 @@ export function CreatePostForm() {
         {/* ════════════════ BLOOD_FINDING Fields ════════════════ */}
         {form.type === "BLOOD_FINDING" && (
           <>
-            <SectionDivider title="Blood Request Details" icon={<Heart className="w-4 h-4 text-primary" />} />
+            <div className="sm:col-span-2">
+              <SectionDivider title="Blood Request Details" icon={<Heart className="w-4 h-4 text-primary" />} />
+            </div>
 
             {/* Blood Group */}
             <div className="space-y-2">
@@ -500,7 +509,9 @@ export function CreatePostForm() {
         {/* ════════════════ BLOOD_DONATION Fields ════════════════ */}
         {form.type === "BLOOD_DONATION" && (
           <>
-            <SectionDivider title="Donation Details" icon={<Heart className="w-4 h-4 text-primary" />} />
+            <div className="sm:col-span-2">
+              <SectionDivider title="Donation Details" icon={<Heart className="w-4 h-4 text-primary" />} />
+            </div>
 
             {/* Title */}
             <div className="space-y-2 sm:col-span-2">
@@ -561,7 +572,9 @@ export function CreatePostForm() {
         {/* ════════════════ HELPING Fields ════════════════ */}
         {form.type === "HELPING" && (
           <>
-            <SectionDivider title="Campaign Details" icon={<HandHelping className="w-4 h-4 text-primary" />} />
+            <div className="sm:col-span-2">
+              <SectionDivider title="Campaign Details" icon={<HandHelping className="w-4 h-4 text-primary" />} />
+            </div>
 
             {/* Title */}
             <div className="space-y-2 sm:col-span-2">
@@ -647,40 +660,62 @@ export function CreatePostForm() {
         )}
 
         {/* ════════════════ Common Fields ════════════════ */}
-        <SectionDivider title="Contact & Location" icon={<Clock className="w-4 h-4 text-primary" />} />
+        <div className="sm:col-span-2">
+          <SectionDivider title="Contact & Location" icon={<Clock className="w-4 h-4 text-primary" />} />
+        </div>
 
-        {/* Phone Number */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            Contact Number <RequiredMark />
-          </label>
-          <div className="flex">
-            <div className="flex h-10 items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm font-medium text-muted-foreground select-none">
-              🇧🇩 {COUNTRY_CODE}
+        {/* Combined Row for Contact and Detailed Location */}
+        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Phone Number */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Contact Number <RequiredMark />
+            </label>
+            <div className="flex">
+              <div className="flex h-10 items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm font-medium text-muted-foreground select-none">
+                🇧🇩 {COUNTRY_CODE}
+              </div>
+              <input
+                type="tel"
+                placeholder="1XXXXXXXXX"
+                value={form.phone}
+                onChange={(e) => {
+                  let digits = e.target.value.replace(/\D/g, "");
+                  if (digits.startsWith("880")) digits = digits.substring(3);
+                  else if (digits.startsWith("88")) digits = digits.substring(2);
+                  else if (digits.startsWith("8")) digits = digits.substring(1);
+                  if (digits.startsWith("0")) digits = digits.substring(1);
+                  digits = digits.slice(0, 10);
+                  handleChange("phone", digits);
+                }}
+                onBlur={() => handleBlur("phone")}
+                className={`${inputClass} rounded-l-none`}
+                maxLength={10}
+              />
             </div>
-            <input
-              type="tel"
-              placeholder="1XXXXXXXXX"
-              value={form.phone}
-              onChange={(e) => {
-                let digits = e.target.value.replace(/\D/g, "");
-                if (digits.startsWith("880")) digits = digits.substring(3);
-                else if (digits.startsWith("88")) digits = digits.substring(2);
-                else if (digits.startsWith("8")) digits = digits.substring(1);
-                if (digits.startsWith("0")) digits = digits.substring(1);
-                digits = digits.slice(0, 10);
-                handleChange("phone", digits);
-              }}
-              onBlur={() => handleBlur("phone")}
-              className={`${inputClass} rounded-l-none`}
-              maxLength={10}
-            />
+            <FieldError message={touched.contactNumber ? errors.contactNumber : undefined} />
           </div>
-          <FieldError message={touched.contactNumber ? errors.contactNumber : undefined} />
+
+          {/* Detailed Location */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">
+              Detailed Location{" "}
+              {form.type === "HELPING" ? <RequiredMark /> : <span className="text-muted-foreground text-xs">(optional — like Hospital, Ward)</span>}
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. DMCH, Ward 5"
+              value={form.location}
+              onChange={(e) => handleChange("location", e.target.value)}
+              onBlur={() => handleBlur("location")}
+              className={inputClass}
+            />
+            <FieldError message={touched.location ? errors.location : undefined} />
+          </div>
         </div>
 
         {/* Content / Description */}
-        <div className="space-y-2">
+        <div className="space-y-2 sm:col-span-2">
           <label className="text-sm font-medium">
             Description{" "}
             <span className="text-muted-foreground text-xs">(optional)</span>
@@ -694,18 +729,17 @@ export function CreatePostForm() {
           />
         </div>
 
-        {/* ════════════════ Location Section ════════════════ */}
-        <div className="space-y-3 sm:col-span-2 border-t pt-4 mt-1">
-          <p className="text-sm font-medium">
-            Location{" "}
-            {form.type === "BLOOD_FINDING" ? <RequiredMark /> : <span className="text-muted-foreground text-xs">(optional)</span>}
+        {/* ════════════════ Location Cascading Sections (Division/District/Upazila) ════════════════ */}
+        <div className="space-y-3 sm:col-span-2 border-t pt-4 mt-1 bg-muted/5 p-4 rounded-xl border border-dashed border-primary/10">
+          <p className="text-sm font-bold flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary" />
+            Area Selection 
+            {form.type === "BLOOD_FINDING" ? <RequiredMark /> : <span className="text-muted-foreground text-[10px] font-normal uppercase tracking-wider">(optional)</span>}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Division */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">
-                Division {form.type === "BLOOD_FINDING" && <RequiredMark />}
-              </label>
+              <label className="text-xs font-medium text-muted-foreground">Division</label>
               <select
                 value={form.division}
                 onChange={(e) => handleChange("division", e.target.value)}
@@ -724,9 +758,7 @@ export function CreatePostForm() {
 
             {/* District */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">
-                District {form.type === "BLOOD_FINDING" && <RequiredMark />}
-              </label>
+              <label className="text-xs font-medium text-muted-foreground">District</label>
               <select
                 value={form.district}
                 onChange={(e) => handleChange("district", e.target.value)}
@@ -746,9 +778,7 @@ export function CreatePostForm() {
 
             {/* Upazila */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">
-                Upazila {form.type === "BLOOD_FINDING" && <RequiredMark />}
-              </label>
+              <label className="text-xs font-medium text-muted-foreground">Upazila</label>
               <select
                 value={form.upazila}
                 onChange={(e) => handleChange("upazila", e.target.value)}
@@ -765,23 +795,6 @@ export function CreatePostForm() {
               </select>
               <FieldError message={touched.upazila ? errors.upazila : undefined} />
             </div>
-          </div>
-
-          {/* Detailed Location */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">
-              Detailed Location{" "}
-              {form.type === "HELPING" ? <RequiredMark /> : <span className="text-muted-foreground">(optional — for Google Maps integration later)</span>}
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Dhaka Medical College Hospital, Ward 5"
-              value={form.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              onBlur={() => handleBlur("location")}
-              className={inputClass}
-            />
-            <FieldError message={touched.location ? errors.location : undefined} />
           </div>
         </div>
 
@@ -804,12 +817,12 @@ export function CreatePostForm() {
           {form.images.length > 0 && (
             <div className="space-y-2">
               {form.images.map((url, index) => (
-                <div key={index} className="flex items-center gap-2 group">
-                  <div className="flex items-center gap-2 flex-1 px-3 py-2 bg-muted/50 rounded-md text-xs text-muted-foreground truncate border">
-                    <span className="text-[10px] font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 shrink-0">
+                <div key={index} className="flex items-center gap-2 group animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="flex items-center gap-2 flex-1 px-3 py-2 bg-muted/30 hover:bg-muted/50 rounded-md text-xs text-muted-foreground truncate border border-dashed hover:border-solid transition-all">
+                    <span className="text-[10px] font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 shrink-0 ring-1 ring-primary/20">
                       {index + 1}
                     </span>
-                    <span className="truncate">{url}</span>
+                    <span className="truncate font-mono">{url}</span>
                   </div>
                   <button
                     type="button"

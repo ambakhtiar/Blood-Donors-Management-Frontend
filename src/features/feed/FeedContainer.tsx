@@ -19,6 +19,8 @@ export default function FeedContainer() {
     bloodGroup: "",
   });
 
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
   const {
     data,
     isLoading,
@@ -75,9 +77,23 @@ export default function FeedContainer() {
 
       {/* Center Column: Feed */}
       <main className="lg:col-span-2 space-y-6">
-        {/* Mobile Filters */}
+        {/* Mobile Filters Toggle */}
         <div className="lg:hidden mb-6">
-          <FeedFilters filters={filters} onChange={setFilters} />
+          <Button 
+            variant="outline" 
+            className="w-full justify-between items-center font-bold px-4 h-12 shadow-sm border-primary/20 bg-card rounded-xl"
+            onClick={() => setMobileFiltersOpen((prev) => !prev)}
+          >
+            <span className="flex items-center gap-2 text-foreground">
+               <span className="text-xl">🎛</span> 
+               Filter & Sort
+            </span>
+            <span className={`text-xl transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`}>▼</span>
+          </Button>
+          
+          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${mobileFiltersOpen ? "max-h-[1000px] opacity-100 mt-4" : "max-h-0 opacity-0 m-0"}`}>
+            <FeedFilters filters={filters} onChange={setFilters} />
+          </div>
         </div>
 
         {/* ═══════ Create Post Prompt ═══════ */}

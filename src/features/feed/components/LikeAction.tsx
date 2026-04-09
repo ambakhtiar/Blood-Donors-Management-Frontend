@@ -6,6 +6,8 @@ import { Heart } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toggleLike } from "@/services/post.service";
 import { toast } from "sonner"; // Assuming sonner is used, if not we'll fallback to alert
+import { useAuthContext } from "@/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 
 interface LikeActionProps {
   postId: string;
@@ -15,6 +17,9 @@ interface LikeActionProps {
 
 export function LikeAction({ postId, initialLikes, initialHasLiked }: LikeActionProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuthContext();
+  const router = useRouter();
+
   const [hasLiked, setHasLiked] = useState(initialHasLiked);
   const [likesCount, setLikesCount] = useState(initialLikes);
 
@@ -44,11 +49,20 @@ export function LikeAction({ postId, initialLikes, initialHasLiked }: LikeAction
     }
   });
 
+  const handleLike = () => {
+    if (!user) {
+      toast.error("Please login to like this post");
+      router.push("/login");
+      return;
+    }
+    mutation.mutate();
+  };
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={() => mutation.mutate()}
+      onClick={handleLike}
       disabled={mutation.isPending}
       className={`flex-1 rounded-none hover:bg-primary/5 transition-all group py-5 ${hasLiked ? 'text-primary' : 'text-muted-foreground'}`}
     >

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { User2 } from "lucide-react"; // Using User2 as fallback
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { useAuthContext } from "@/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 
 interface CommentSectionProps {
   postId: string;
@@ -15,6 +17,9 @@ interface CommentSectionProps {
 
 export function CommentSection({ postId }: CommentSectionProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuthContext();
+  const router = useRouter();
+
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null);
 
@@ -45,6 +50,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error("Please login to comment");
+      router.push("/login");
+      return;
+    }
     if (!newComment.trim()) return;
 
     const payload: ICommentPayload = {
