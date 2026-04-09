@@ -244,9 +244,9 @@ model Post {
 
     // Location Data
     location  String?
-    division  String?
-    district  String?
-    upazila   String?
+    division  String
+    district  String
+    upazila   String
     area      String?
     latitude  Float?
     longitude Float?

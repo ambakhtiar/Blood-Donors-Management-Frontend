@@ -1,4 +1,5 @@
 import axiosInstance from "../lib/axiosInstance";
+import type { ICreatePostPayload, IPostResponse } from "../types/post.types";
 
 export interface IPostFilters {
   searchTerm?: string;
@@ -6,8 +7,13 @@ export interface IPostFilters {
   bloodGroup?: string;
   division?: string;
   district?: string;
+  upazila?: string;
   isResolved?: boolean;
   hasLiked?: boolean;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface ICommentPayload {
@@ -16,12 +22,12 @@ export interface ICommentPayload {
   parentId?: string | null;
 }
 
-export const getAllPosts = async (filters?: IPostFilters): Promise<any> => {
+export const getAllPosts = async (paramsObj?: IPostFilters): Promise<any> => {
   const params = new URLSearchParams();
 
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== "") {
+  if (paramsObj) {
+    Object.entries(paramsObj).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null) {
         params.append(key, String(value));
       }
     });
@@ -33,6 +39,11 @@ export const getAllPosts = async (filters?: IPostFilters): Promise<any> => {
 
 export const getSinglePost = async (id: string): Promise<any> => {
   const response = await axiosInstance.get(`/posts/${id}`);
+  return response.data;
+};
+
+export const createPost = async (payload: ICreatePostPayload): Promise<IPostResponse> => {
+  const response = await axiosInstance.post("/posts", payload);
   return response.data;
 };
 

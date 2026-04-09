@@ -1,27 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getAllPosts, IPostFilters } from "@/services/post.service";
 import { PostCard } from "./components/PostCard";
 import { PostCardSkeleton } from "./components/PostCardSkeleton";
 import { FeedFilters } from "./components/FeedFilters";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, Droplets, Heart, HandHelping } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 export default function FeedContainer() {
+  const { user } = useAuthContext();
   const [filters, setFilters] = useState<IPostFilters>({
     searchTerm: "",
     type: "",
     bloodGroup: "",
   });
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
     queryKey: ["posts", filters],
-    queryFn: () => getAllPosts(filters),
+    queryFn: ({ pageParam = 1 }) => getAllPosts({ ...filters, page: pageParam, limit: 10 }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      // Usually backend returns meta: { total, page, limit }
+      // We will assume lastPage.data.length === limit means there are more posts.
+      if (lastPage?.data?.length === 10) {
+        return allPages.length + 1;
+      }
+      return undefined;
+    },
   });
 
-  const posts = data?.data || [];
+  const posts = data?.pages.flatMap((page) => page.data || []) || [];
+
+  // Implement Intersection Observer natively
+  const observerRef = React.useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = React.useCallback((node: HTMLDivElement) => {
+    if (isFetchingNextPage) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+
+  // Get user initial for avatar
+  const userName =
+    user?.donorProfile?.name ||
+    user?.hospital?.name ||
+    user?.organisation?.name ||
+    "User";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto py-8 px-4 sm:px-6">
@@ -32,27 +75,44 @@ export default function FeedContainer() {
 
       {/* Center Column: Feed */}
       <main className="lg:col-span-2 space-y-6">
-        {/* Mobile Filters (Optional, can be expanded later via a drawer if needed) */}
+        {/* Mobile Filters */}
         <div className="lg:hidden mb-6">
           <FeedFilters filters={filters} onChange={setFilters} />
         </div>
 
-        {/* Create Post Interface Placeholder */}
-        <div className="bg-card rounded-xl border border-primary/10 p-4 shadow-sm mb-6 cursor-pointer hover:bg-card/80 transition-colors">
-          <div className="flex gap-3 items-center">
-             <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
-               C
+        {/* ═══════ Create Post Prompt ═══════ */}
+        <div className="bg-card rounded-xl border border-primary/10 shadow-sm overflow-hidden">
+          <Link href="/posts/create" className="block p-4">
+             <div className="flex gap-3 items-center">
+               <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/15 text-primary font-bold text-sm border-2 border-primary/20 shrink-0">
+                 {userInitial}
+               </div>
+               <div className="bg-secondary/40 hover:bg-secondary/60 text-muted-foreground w-full py-2.5 px-4 rounded-full transition-colors text-sm">
+                 What kind of help or donation do you need?
+               </div>
              </div>
-             <div className="bg-secondary/40 hover:bg-secondary/60 text-muted-foreground w-full py-2.5 px-4 rounded-full transition-colors">
-                What kind of help or donation do you need?
-             </div>
+          </Link>
+          <div className="border-t border-primary/5 px-2 py-1.5 flex">
+            <Link href="/posts/create" className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-destructive hover:bg-destructive/5 transition-colors">
+              <Droplets className="w-3.5 h-3.5" />
+              Blood Request
+            </Link>
+            <div className="w-px bg-primary/10 my-1" />
+            <Link href="/posts/create" className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
+              <Heart className="w-3.5 h-3.5" />
+              Donate Blood
+            </Link>
+            <div className="w-px bg-primary/10 my-1" />
+            <Link href="/posts/create" className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors">
+              <HandHelping className="w-3.5 h-3.5" />
+              Get Help
+            </Link>
           </div>
         </div>
 
-        {/* Feed States */}
+        {/* Initial Loading */}
         {isLoading && (
           <div>
-            <PostCardSkeleton />
             <PostCardSkeleton />
             <PostCardSkeleton />
           </div>
@@ -84,6 +144,21 @@ export default function FeedContainer() {
             {posts.map((post: any) => (
               <PostCard key={post.id} post={post} />
             ))}
+            
+            {/* Infinite Scroll Trigger */}
+            <div ref={loadMoreRef} className="h-10 flex items-center justify-center py-4">
+              {isFetchingNextPage ? (
+                <div className="flex gap-2 items-center text-muted-foreground">
+                  <span className="animate-spin text-xl">🔄</span> Loading more...
+                </div>
+              ) : hasNextPage ? (
+                <span className="text-sm text-muted-foreground">Scroll for more</span>
+              ) : (
+                 <div className="text-sm font-medium text-muted-foreground bg-secondary/50 px-4 py-2 rounded-full border border-primary/5">
+                    End of posts
+                 </div>
+              )}
+            </div>
           </div>
         )}
       </main>

@@ -56,9 +56,9 @@ export function PostDetailsDrawer({ post, isOpen, onClose, authorName }: PostDet
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* Post Summary header in Drawer */}
-          <div className="p-6 bg-gradient-to-b from-primary/5 to-transparent border-b border-primary/5">
+          <div className="p-6 bg-gradient-to-b from-primary/5 to-transparent border-b border-primary/5 shrink-0 max-h-[30vh] overflow-y-auto">
              <h2 className="text-xl font-black text-foreground mb-3">{post.title || "Post Update"}</h2>
              <p className="text-sm text-foreground/80 leading-relaxed italic mb-4">{post.content}</p>
              
@@ -78,11 +78,12 @@ export function PostDetailsDrawer({ post, isOpen, onClose, authorName }: PostDet
              </div>
           </div>
 
+          <div className="p-4 py-2 border-b bg-secondary/10 shrink-0">
+             <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">Comments</span>
+          </div>
+
           {/* Actual Comment Section */}
-          <div className="h-full">
-            <div className="p-4 py-2 border-b bg-secondary/10">
-               <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">Comments</span>
-            </div>
+          <div className="flex-1 min-h-0 relative">
             <CommentSection postId={post.id} />
           </div>
         </div>
