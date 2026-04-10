@@ -38,6 +38,7 @@ Any role can create posts. `BLOOD_DONATION` posts track donor history.
 | POST | `/posts` | Create a new post (BLOOD_FINDING, BLOOD_DONATION, HELPING) | Yes | USER, HOSPITAL, ORG |
 | GET | `/posts` | Get all posts (includes filters) | No | Public |
 | GET | `/posts/:id` | Get details of a single post | No | Public |
+| GET | `/posts/user/:userId` | Get all posts of a single user | Yes | All |
 | PATCH | `/posts/:id` | Update post details | Yes | Author/Admin |
 | DELETE | `/posts/:id` | Soft delete a post | Yes | Author/Admin |
 | PATCH | `/posts/:id/resolve` | Mark a blood finding post as resolved | Yes | Author |

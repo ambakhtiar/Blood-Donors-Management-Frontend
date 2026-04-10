@@ -41,6 +41,7 @@ export interface IUser {
   id: string;
   email: string | null;
   contactNumber: string;
+  profilePictureUrl: string | null;
   role: UserRole;
   accountStatus: AccountStatus;
   needsPasswordChange: boolean;

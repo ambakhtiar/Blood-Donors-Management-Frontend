@@ -117,6 +117,57 @@ export default function Navbar() {
                         {user.role.replace("_", " ").toLowerCase()}
                       </span>
                     </div>
+
+                    {/* Role-based Quick Links */}
+                    {user.role === "USER" && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          router.push("/user/donation-history");
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                      >
+                        <Droplets className="h-4 w-4" />
+                        Donation History
+                      </button>
+                    )}
+                    {user.role === "HOSPITAL" && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          router.push("/hospital/donation-records");
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                      >
+                        <Droplets className="h-4 w-4" />
+                        Donation Records
+                      </button>
+                    )}
+                    {user.role === "ORGANISATION" && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          router.push("/organisation/volunteers");
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                      >
+                        <User className="h-4 w-4" />
+                        Members/Volunteers
+                      </button>
+                    )}
+                    {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          router.push("/admin");
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                      >
+                        <User className="h-4 w-4" />
+                        Admin Dashboard
+                      </button>
+                    )}
+
                     <button
                       onClick={() => {
                         setUserMenuOpen(false);
@@ -197,6 +248,48 @@ export default function Navbar() {
                     <User className="h-4 w-4" />
                     My Profile
                   </Link>
+
+                  {/* Role-based Mobile Links */}
+                  {user.role === "USER" && (
+                    <Link
+                      href="/user/donation-history"
+                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Droplets className="h-4 w-4" />
+                      Donation History
+                    </Link>
+                  )}
+                  {user.role === "HOSPITAL" && (
+                    <Link
+                      href="/hospital/donation-records"
+                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Droplets className="h-4 w-4" />
+                      Donation Records
+                    </Link>
+                  )}
+                  {user.role === "ORGANISATION" && (
+                    <Link
+                      href="/organisation/volunteers"
+                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Members/Volunteers
+                    </Link>
+                  )}
+                  {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
