@@ -282,8 +282,16 @@ export function PostCard({ post }: PostCardProps) {
     >
       <CardHeader className="flex flex-row items-start gap-3 pb-3">
         {/* Avatar */}
-        <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg mb-1">
-          {authorName.charAt(0)}
+        <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-lg mb-1 overflow-hidden border border-primary/5">
+          {post.author?.profilePictureUrl ? (
+            <img 
+              src={post.author.profilePictureUrl} 
+              alt={authorName} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            authorName.charAt(0)
+          )}
         </div>
 
         <div className="flex-1 flex flex-col min-w-0 pt-0.5">

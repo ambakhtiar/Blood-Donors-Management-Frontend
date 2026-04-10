@@ -100,8 +100,16 @@ export default function FeedContainer() {
         <div className="bg-card rounded-xl border border-primary/10 shadow-sm overflow-hidden">
           <Link href="/posts/create" className="block p-4">
              <div className="flex gap-3 items-center">
-               <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/15 text-primary font-bold text-sm border-2 border-primary/20 shrink-0">
-                 {userInitial}
+               <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/15 text-primary font-bold text-sm border-2 border-primary/20 shrink-0 overflow-hidden">
+                 {user?.profilePictureUrl ? (
+                    <img 
+                      src={user.profilePictureUrl} 
+                      alt={userName} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    userInitial
+                  )}
                </div>
                <div className="bg-secondary/40 hover:bg-secondary/60 text-muted-foreground w-full py-2.5 px-4 rounded-full transition-colors text-sm">
                  What kind of help or donation do you need?

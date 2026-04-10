@@ -70,7 +70,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col bg-background">
+    <div className="flex flex-col h-full bg-transparent border-t border-primary/5">
       {/* Comment List */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
         {isLoading ? (
@@ -80,53 +80,87 @@ export function CommentSection({ postId }: CommentSectionProps) {
             No comments yet. Be the first to share your thoughts!
           </div>
         ) : (
-          comments?.data?.map((comment: any) => (
-            <div key={comment.id} className="space-y-4">
-              <div className="flex gap-3">
-                <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold uppercase overflow-hidden shrink-0 border border-primary/10">
-                  {comment.user?.donorProfile?.name?.charAt(0) || "U"}
-                </div>
-                <div className="flex-1 bg-secondary/30 p-3 rounded-2xl rounded-tl-none border border-primary/5">
-                  <div className="flex justify-between items-baseline mb-1">
-                    <span className="font-bold text-sm text-primary/80">
-                      {comment.user?.donorProfile?.name || "User"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                    </span>
-                  </div>
-                  <p className="text-sm text-foreground/90">{comment.content}</p>
-                  <button
-                    onClick={() => setReplyTo({ id: comment.id, name: comment.user?.donorProfile?.name })}
-                    className="text-[10px] font-bold text-primary mt-2 hover:underline"
-                  >
-                    Reply
-                  </button>
-                </div>
-              </div>
+          comments?.data?.map((comment: any) => {
+            const commenterName = comment.user?.donorProfile?.name || 
+                                  comment.user?.hospital?.name || 
+                                  comment.user?.organisation?.name || 
+                                  comment.user?.admin?.name || "User";
+            const commenterInitial = commenterName.charAt(0).toUpperCase();
 
-              {/* Nested Replies (1 Level Only) */}
-              {comment.replies?.length > 0 && (
-                <div className="ml-11 space-y-4 border-l-2 border-primary/10 pl-4 mt-2">
-                  {comment.replies.map((reply: any) => (
-                    <div key={reply.id} className="flex gap-2">
-                      <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold uppercase shrink-0">
-                        {reply.user?.donorProfile?.name?.charAt(0) || "U"}
-                      </div>
-                      <div className="flex-1 bg-primary/5 p-2.5 rounded-xl rounded-tl-none">
-                        <div className="flex justify-between items-baseline mb-0.5">
-                          <span className="font-bold text-[11px] text-primary/70">
-                            {reply.user?.donorProfile?.name || "User"}
-                          </span>
-                        </div>
-                        <p className="text-xs text-foreground/90">{reply.content}</p>
-                      </div>
+            return (
+              <div key={comment.id} className="space-y-4">
+                <div className="flex gap-3">
+                  <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold uppercase overflow-hidden shrink-0 border border-primary/10">
+                    {comment.user?.profilePictureUrl ? (
+                      <img 
+                        src={comment.user.profilePictureUrl} 
+                        alt={commenterName} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      commenterInitial
+                    )}
+                  </div>
+                  <div className="flex-1 bg-secondary/30 p-4 rounded-2xl rounded-tl-none border border-primary/10 shadow-sm">
+                    <div className="flex flex-wrap justify-between items-start gap-x-4 gap-y-1 mb-1.5">
+                      <span className="font-bold text-[13px] md:text-sm text-primary/90 leading-tight">
+                        {commenterName}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-medium shrink-0">
+                        {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                      </span>
                     </div>
-                  ))}
+                    <p className="text-[13px] md:text-sm text-foreground/90 leading-relaxed">{comment.content}</p>
+                    <div className="flex items-center gap-4 mt-2.5">
+                      <button
+                        onClick={() => setReplyTo({ id: comment.id, name: commenterName })}
+                        className="text-[10px] font-bold text-primary hover:text-primary/70 transition-colors"
+                      >
+                        Reply
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))
+
+                {/* Nested Replies (1 Level Only) */}
+                {comment.replies?.length > 0 && (
+                  <div className="ml-11 space-y-4 border-l-2 border-primary/10 pl-4 mt-2">
+                    {comment.replies.map((reply: any) => {
+                      const replyName = reply.user?.donorProfile?.name || 
+                                        reply.user?.hospital?.name || 
+                                        reply.user?.organisation?.name || 
+                                        reply.user?.admin?.name || "User";
+                      const replyInitial = replyName.charAt(0).toUpperCase();
+                      
+                      return (
+                        <div key={reply.id} className="flex gap-2">
+                          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold uppercase shrink-0 overflow-hidden border border-primary/5">
+                            {reply.user?.profilePictureUrl ? (
+                              <img 
+                                src={reply.user.profilePictureUrl} 
+                                alt={replyName} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              replyInitial
+                            )}
+                          </div>
+                          <div className="flex-1 bg-primary/5 p-2.5 rounded-xl rounded-tl-none">
+                            <div className="flex justify-between items-baseline mb-0.5">
+                              <span className="font-bold text-[11px] text-primary/70">
+                                {replyName}
+                              </span>
+                            </div>
+                            <p className="text-xs text-foreground/90">{reply.content}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 

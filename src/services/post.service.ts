@@ -61,3 +61,8 @@ export const getPostComments = async (postId: string): Promise<any> => {
   const response = await axiosInstance.get(`/posts/engagement/${postId}/comments`);
   return response.data;
 };
+
+export const getUserPosts = async (userId: string): Promise<any> => {
+  const response = await axiosInstance.get(`/posts/user/${userId}`);
+  return response.data;
+};

@@ -91,8 +91,16 @@ export default function Navbar() {
                 aria-haspopup="true"
                 aria-expanded={userMenuOpen}
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">
-                  {displayName.charAt(0).toUpperCase()}
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold border border-primary/20 overflow-hidden shrink-0">
+                   {user.profilePictureUrl ? (
+                      <img 
+                        src={user.profilePictureUrl} 
+                        alt={displayName} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      displayName.charAt(0).toUpperCase()
+                    )}
                 </div>
                 <span className="max-w-[120px] truncate">{displayName}</span>
                 <ChevronDown

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, Loader2, Save, User as UserIcon, Weight, MapPin, Building2, Users } from "lucide-react";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { updateProfileSchema, type UpdateProfileFormValues } from "@/validations/user.validation";
 import { updateMyProfile } from "@/services/user.service";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ const selectClass = "flex h-10 w-full rounded-md border border-input bg-backgrou
 
 export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProps) {
   const queryClient = useQueryClient();
+  const { setUser } = useAuthContext();
   const [districts, setDistricts] = useState<string[]>([]);
   const [upazilas, setUpazilas] = useState<string[]>([]);
 
@@ -85,7 +87,10 @@ export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProp
     onSuccess: (response) => {
       if (response.success) {
         toast.success("Profile updated successfully");
+        // Sync global auth state instantly
+        setUser(response.data);
         queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
         onClose();
       } else {
         toast.error(response.message || "Failed to update profile");

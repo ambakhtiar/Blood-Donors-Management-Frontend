@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSinglePost } from "@/services/post.service";
 import { PostCard } from "./components/PostCard";
@@ -11,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function PostDetailsContainer({ postId }: { postId: string }) {
   const router = useRouter();
-  
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["post", postId],
     queryFn: () => getSinglePost(postId),
@@ -38,7 +37,6 @@ export default function PostDetailsContainer({ postId }: { postId: string }) {
     );
   }
 
-  // Robust post extraction to handle different API response formats
   const post = data?.data || (data?.id ? data : null);
 
   if (!post) {
@@ -55,37 +53,40 @@ export default function PostDetailsContainer({ postId }: { postId: string }) {
   }
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" className="hover:bg-primary/5 -ml-3 group text-muted-foreground hover:text-primary transition-colors" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> 
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+      <div className="flex items-center justify-between mb-8">
+        <Button
+          variant="ghost"
+          className="hover:bg-primary/5 -ml-3 group text-muted-foreground hover:text-primary transition-colors text-base font-medium"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
           Back to Feed
         </Button>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Post Details - Main Content */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="bg-card rounded-2xl border border-primary/5 shadow-sm overflow-hidden">
-             <PostCard post={post} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+
+        {/* Left Column: Post Details */}
+        <div className="flex flex-col gap-6 min-w-50">
+          <div className="bg-card rounded-2xl border border-primary/5 shadow-md overflow-hidden">
+            <PostCard post={post} />
           </div>
         </div>
 
-        {/* Right Column: Comments & Engagement Sidebar */}
-        <div className="lg:col-span-4 sticky top-24 space-y-6">
-          <div className="bg-card rounded-2xl border border-primary/10 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
+        {/* Right Column: Comments Sidebar */}
+        <div className="sticky top-24 space-y-6 min-w-50">
+          <div className="bg-card rounded-2xl border border-primary/10 shadow-lg overflow-hidden flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
             <div className="px-6 py-5 border-b border-primary/5 bg-secondary/5 flex items-center justify-between shrink-0">
-              <h3 className="font-bold text-lg flex items-center gap-2">
+              <h3 className="font-bold text-xl flex items-center gap-2 text-foreground">
                 Discussion
-                <span className="bg-primary/10 text-primary text-xs px-2.5 py-0.5 rounded-full font-bold">
+                <span className="bg-primary/10 text-primary text-[11px] px-2.5 py-0.5 rounded-full font-bold">
                   {post._count?.comments || 0}
                 </span>
               </h3>
             </div>
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="p-4 sm:p-6">
-                <CommentSection postId={post.id} />
-              </div>
+              <CommentSection postId={post.id} />
             </div>
           </div>
         </div>

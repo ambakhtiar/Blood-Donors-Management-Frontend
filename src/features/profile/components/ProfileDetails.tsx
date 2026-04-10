@@ -26,6 +26,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useState } from "react";
 import { EditProfileModal } from "./EditProfileModal";
+import { getUserPosts } from "@/services/post.service";
+import { PostCard } from "@/features/feed/components/PostCard";
+
 
 export function ProfileDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -33,6 +36,14 @@ export function ProfileDetails() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["my-profile"],
     queryFn: getMyProfile,
+  });
+
+  const profileData = data?.data;
+
+  const { data: postsData, isLoading: isPostsLoading } = useQuery({
+    queryKey: ["user-posts", profileData?.id],
+    queryFn: () => getUserPosts(profileData!.id),
+    enabled: !!profileData?.id,
   });
 
   if (isLoading) {
@@ -242,7 +253,7 @@ export function ProfileDetails() {
                 <CardDescription>Quick access to hospital donation management</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full md:w-auto gap-2" variant="primary" asChild>
+                <Button className="w-full md:w-auto gap-2" variant="default" asChild>
                   <Link href="/hospital/donation-records">
                     <BadgeCheck className="w-4 h-4" /> Go to Donation Records
                   </Link>
@@ -354,7 +365,7 @@ export function ProfileDetails() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">
-                      {user.role === "SUPER_ADMIN" ? user.superAdmin?.name : user.admin?.name}
+                      {user.admin?.name}
                     </h2>
                     <Badge className="bg-slate-800 text-white border-0">
                       {user.role === "SUPER_ADMIN" ? "Super Admin" : "System Admin"}
@@ -408,8 +419,55 @@ export function ProfileDetails() {
 
       {renderRoleProfile()}
 
+      {/* User Posts Section */}
+      <div className="pt-8 border-t border-primary/5">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <FileText className="w-5 h-5" />
+             </div>
+             <h2 className="text-2xl font-bold">My Activity</h2>
+          </div>
+          <Badge variant="outline" className="font-semibold px-3 py-1">
+            {postsData?.data?.length || 0} Posts
+          </Badge>
+        </div>
+
+        {isPostsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Skeleton className="h-[300px] w-full rounded-2xl" />
+            <Skeleton className="h-[300px] w-full rounded-2xl" />
+          </div>
+        ) : postsData?.data?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {postsData.data.map((post: any) => (
+              <div key={post.id} className="h-full">
+                <PostCard post={post} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Card className="border-dashed border-2 bg-muted/50">
+            <CardContent className="py-12 flex flex-col items-center justify-center text-center">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-xl font-bold text-muted-foreground">No posts yet</h3>
+              <p className="text-muted-foreground max-w-xs mt-2">
+                You haven't shared any donation requests or updates yet. Your activity will appear here.
+              </p>
+              <Button className="mt-6 gap-2" asChild>
+                <Link href="/feed">
+                  <Droplets className="w-4 h-4" /> Create Your First Post
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       {/* Profile Edit Modal */}
-      {isEditModalOpen && (
+      {isEditModalOpen && user && (
         <EditProfileModal 
           user={user} 
           isOpen={isEditModalOpen} 
