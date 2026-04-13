@@ -144,6 +144,27 @@ export interface IPost {
   };
 }
 
+// ---------- Hospital Donation Records ----------
+export interface IHospitalDonationRecord {
+  id: string;
+  hospitalId: string;
+  bloodDonorId: string;
+  donationDate: string;
+  weight: number;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  bloodDonor: IBloodDonor;
+}
+
+export interface IRecordDonationPayload {
+  contactNumber: string;
+  weight: number;
+  name?: string;
+  bloodGroup?: BloodGroup;
+  gender?: Gender;
+}
+
 // ---------- Auth ----------
 export interface ILoginPayload {
   contactNumber?: string;

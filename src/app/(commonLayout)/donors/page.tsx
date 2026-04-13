@@ -16,20 +16,20 @@ export default function DonorsPage() {
         {/* Abstract Background Shapes */}
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-4 border border-primary/20">
               <UserCheck className="w-3.5 h-3.5" /> Verified Volunteers
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-foreground mb-4 tracking-tight leading-none italic">
+            <h1 className="text-4xl md:text-5xl font-black text-foreground mb-4 tracking-tight leading-none">
               Find <span className="text-primary italic">Life-Savers</span> <br />
               Near You.
             </h1>
             <p className="text-lg text-muted-foreground font-medium max-w-2xl leading-relaxed">
-              Searching for blood is now easier and faster. Use our advanced filters to find verified donors in your specific area across Bangladesh. 
+              Searching for blood is now easier and faster. Use our advanced filters to find verified donors in your specific area across Bangladesh.
             </p>
-            
+
             <div className="flex flex-wrap gap-6 mt-8">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />

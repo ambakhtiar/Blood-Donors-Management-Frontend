@@ -33,6 +33,7 @@ export async function proxy(request: NextRequest) {
       const isAdminRoute = protectedRoutes.admin.some(r => pathname.startsWith(r));
       const isHospitalRoute = protectedRoutes.hospital.some(r => pathname.startsWith(r));
       const isOrgRoute = protectedRoutes.organisation.some(r => pathname.startsWith(r));
+      const isAuthenticatedRoute = protectedRoutes.authenticated.some(r => pathname.startsWith(r));
 
       if (isAdminRoute && role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
         return NextResponse.redirect(new URL('/feed', request.url));
@@ -43,6 +44,11 @@ export async function proxy(request: NextRequest) {
       }
 
       if (isOrgRoute && role !== 'ORGANISATION') {
+        return NextResponse.redirect(new URL('/feed', request.url));
+      }
+
+      if (isAuthenticatedRoute && role !== 'USER' && role !== 'DONOR') {
+        // Prevent hospital/org/admin from accessing normal user routes
         return NextResponse.redirect(new URL('/feed', request.url));
       }
     }

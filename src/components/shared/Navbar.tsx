@@ -10,6 +10,8 @@ import {
   LogOut,
   User,
   ChevronDown,
+  PlusCircle,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import ThemeToggle from "./ThemeToggle";
@@ -140,16 +142,28 @@ export default function Navbar() {
                       </button>
                     )}
                     {user.role === "HOSPITAL" && (
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          router.push("/hospital/donation-records");
-                        }}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
-                      >
-                        <Droplets className="h-4 w-4" />
-                        Donation Records
-                      </button>
+                      <>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            router.push("/hospital/record");
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                        >
+                          <PlusCircle className="h-4 w-4" />
+                          Record Donation
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            router.push("/hospital/history");
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-accent"
+                        >
+                          <ClipboardList className="h-4 w-4" />
+                          Donation History
+                        </button>
+                      </>
                     )}
                     {user.role === "ORGANISATION" && (
                       <button
@@ -269,14 +283,24 @@ export default function Navbar() {
                     </Link>
                   )}
                   {user.role === "HOSPITAL" && (
-                    <Link
-                      href="/hospital/donation-records"
-                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <Droplets className="h-4 w-4" />
-                      Donation Records
-                    </Link>
+                    <>
+                      <Link
+                        href="/hospital/record"
+                        className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                        Record Donation
+                      </Link>
+                      <Link
+                        href="/hospital/history"
+                        className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-accent"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        <ClipboardList className="h-4 w-4" />
+                        Donation History
+                      </Link>
+                    </>
                   )}
                   {user.role === "ORGANISATION" && (
                     <Link
