@@ -159,10 +159,13 @@ export interface IHospitalDonationRecord {
 
 export interface IRecordDonationPayload {
   contactNumber: string;
-  weight?: number;
   name?: string;
   bloodGroup?: BloodGroup;
   gender?: Gender;
+  createPost?: boolean;
+  postTitle?: string;
+  postImages?: string[];
+  postContent?: string;
 }
 
 // ---------- Auth ----------

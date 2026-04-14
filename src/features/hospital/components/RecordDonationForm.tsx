@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, PlusCircle, User, Phone, MapPin, Droplet, UserCircle } from "lucide-react";
+import { Loader2, PlusCircle, User, Phone, MapPin, Droplet, UserCircle, Image, FileText, CheckCircle2 } from "lucide-react";
 
 import { recordDonation } from "@/services/hospital.service";
 import { BloodGroup, Gender } from "@/types";
@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { getDivisions, getDistricts, getUpazilas } from "@/lib/bd-location";
 
 const BLOOD_GROUPS: { label: string; value: BloodGroup }[] = [
@@ -54,13 +56,24 @@ export function RecordDonationForm() {
       division: "",
       district: "",
       upazila: "",
+      createPost: false,
+      postTitle: "A life saved today!",
+      postImages: "",
+      postContent: "",
     },
     onSubmit: async ({ value }) => {
       if (!value.name || !value.bloodGroup || !value.gender || !value.contactNumber) {
         toast.error("Please fill out all required fields.");
         return;
       }
-      mutation.mutate(value);
+
+      // Convert image string to array
+      const payload = {
+        ...value,
+        postImages: value.postImages ? value.postImages.split(',').map(s => s.trim()).filter(Boolean) : [],
+      };
+
+      mutation.mutate(payload);
     },
   });
 
@@ -319,6 +332,111 @@ export function RecordDonationForm() {
               />
             </div>
           </div>
+
+          {/* ----- ROW 4: Post Toggle ----- */}
+          <div className="grid grid-cols-1 gap-6">
+            <form.Field
+              name="createPost"
+              children={(field) => (
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-3 p-4 rounded-xl border border-slate-200 bg-white hover:border-primary/50 transition-colors cursor-pointer shadow-sm" onClick={() => field.handleChange(!field.state.value)}>
+                    <Checkbox
+                      id={field.name}
+                      checked={field.state.value}
+                      onCheckedChange={(checked) => field.handleChange(checked)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label
+                        htmlFor={field.name}
+                        className="text-sm font-black leading-none cursor-pointer text-slate-700"
+                      >
+                        PUBLISH DONATION POST
+                      </Label>
+                      <p className="text-xs text-slate-500">
+                        Create a public post to celebrate this donation and inspire others.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+          </div>
+
+          {/* ----- ROW 5: Conditional Post Fields ----- */}
+          <form.Field name="createPost" children={(field) => field.state.value && (
+            <div className="space-y-6 p-6 rounded-2xl bg-primary/5 border border-primary/20 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center gap-2 mb-2 text-primary">
+                <CheckCircle2 className="w-5 h-5" />
+                <h3 className="font-black text-lg uppercase tracking-tight">Post Details</h3>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <form.Field
+                  name="postTitle"
+                  validators={{
+                    onChange: ({ value }) => (!value ? "Post title is required" : undefined),
+                  }}
+                  children={(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name} className="flex items-center gap-2 font-bold text-slate-700 text-sm">
+                        <FileText className="w-4 h-4" /> Post Title *
+                      </Label>
+                      <Input
+                        id={field.name}
+                        placeholder="e.g. A life saved today!"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className={field.state.meta.errors.length ? "border-destructive focus-visible:ring-destructive bg-white" : "bg-white border-slate-200"}
+                      />
+                      {field.state.meta.errors.length ? (
+                        <p className="text-xs font-medium text-destructive">{field.state.meta.errors[0]}</p>
+                      ) : null}
+                    </div>
+                  )}
+                />
+
+                <form.Field
+                  name="postContent"
+                  children={(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name} className="flex items-center gap-2 font-bold text-slate-700 text-sm">
+                        <FileText className="w-4 h-4" /> Post Content (Optional)
+                      </Label>
+                      <Textarea
+                        id={field.name}
+                        placeholder="Write a few lines about this donation..."
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="bg-white border-slate-200 min-h-[100px]"
+                      />
+                    </div>
+                  )}
+                />
+
+                <form.Field
+                  name="postImages"
+                  children={(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name} className="flex items-center gap-2 font-bold text-slate-700 text-sm">
+                        <Image className="w-4 h-4" /> Image URLs
+                      </Label>
+                      <Input
+                        id={field.name}
+                        placeholder="URL1, URL2 (Comma separated)"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="bg-white border-slate-200"
+                      />
+                      <p className="text-[10px] text-slate-400">Add image URLs separated by commas for the post gallery.</p>
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+          )} />
 
           <Button
             type="submit"

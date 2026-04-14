@@ -13,11 +13,12 @@ export const recordDonation = async (payload: IRecordDonationPayload) => {
 };
 
 /**
- * Fetch all donation records for the current hospital.
+ * Fetch all donation records for the current hospital with optional filters/pagination.
  */
-export const getHospitalDonationRecords = async () => {
-  const response = await axiosInstance.get<ApiResponse<{ data: IHospitalDonationRecord[]; meta: any }>>(
-    "/hospitals/donation-records"
+export const getHospitalDonationRecords = async (params?: any) => {
+  const response = await axiosInstance.get<ApiResponse<{ data: IHospitalDonationRecord[]; meta: { page: number; limit: number; total: number } }>>(
+    "/hospitals/donation-records",
+    { params }
   );
   return response.data;
 };
