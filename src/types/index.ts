@@ -159,7 +159,7 @@ export interface IHospitalDonationRecord {
 
 export interface IRecordDonationPayload {
   contactNumber: string;
-  weight: number;
+  weight?: number;
   name?: string;
   bloodGroup?: BloodGroup;
   gender?: Gender;

@@ -300,9 +300,13 @@ export function CreatePostForm() {
     // Clean payload — remove empty optional fields
     const cleanPayload: Record<string, unknown> = {};
     Object.entries(payload).forEach(([key, value]) => {
-      if (value !== undefined && value !== "" && value !== null) {
+      if (value !== undefined && value !== null) {
+        // Handle empty strings for string types with explicit narrowing/casting
+        if (typeof value === "string" && (value as string).trim() === "") return;
+        
         // Don't send empty arrays
         if (Array.isArray(value) && value.length === 0) return;
+        
         cleanPayload[key] = value;
       }
     });

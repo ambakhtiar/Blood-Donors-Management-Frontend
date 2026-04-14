@@ -4,6 +4,7 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, PlusCircle, User, Phone, MapPin, Droplet, UserCircle } from "lucide-react";
 
 import { recordDonation } from "@/services/hospital.service";
@@ -28,6 +29,7 @@ const BLOOD_GROUPS: { label: string; value: BloodGroup }[] = [
 
 export function RecordDonationForm() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: recordDonation,
@@ -35,6 +37,7 @@ export function RecordDonationForm() {
       toast.success(response.message || "Donation recorded successfully");
       queryClient.invalidateQueries({ queryKey: ["hospital-donation-records"] });
       form.reset();
+      router.push("/hospital/history");
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || "Failed to record donation";
@@ -45,7 +48,7 @@ export function RecordDonationForm() {
   const form = useForm({
     defaultValues: {
       name: "",
-      contactNumber: "",
+      contactNumber: "+8801",
       bloodGroup: "" as BloodGroup,
       gender: "" as Gender,
       division: "",

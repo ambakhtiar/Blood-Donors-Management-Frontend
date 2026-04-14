@@ -16,7 +16,7 @@ export const recordDonation = async (payload: IRecordDonationPayload) => {
  * Fetch all donation records for the current hospital.
  */
 export const getHospitalDonationRecords = async () => {
-  const response = await axiosInstance.get<ApiResponse<IHospitalDonationRecord[]>>(
+  const response = await axiosInstance.get<ApiResponse<{ data: IHospitalDonationRecord[]; meta: any }>>(
     "/hospitals/donation-records"
   );
   return response.data;

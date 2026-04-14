@@ -6,7 +6,8 @@ const protectedRoutes = {
   admin: ['/admin', '/dashboard/admin'],
   hospital: ['/hospital', '/dashboard/hospital'],
   organisation: ['/organisation', '/dashboard/organisation'],
-  authenticated: ['/profile', '/settings'],
+  user: ['/user', '/user/donation-history'],
+  authenticated: ['/profile', '/settings', '/donors'],
 };
 
 export async function proxy(request: NextRequest) {
@@ -33,6 +34,7 @@ export async function proxy(request: NextRequest) {
       const isAdminRoute = protectedRoutes.admin.some(r => pathname.startsWith(r));
       const isHospitalRoute = protectedRoutes.hospital.some(r => pathname.startsWith(r));
       const isOrgRoute = protectedRoutes.organisation.some(r => pathname.startsWith(r));
+      const isUserRoute = protectedRoutes.user.some(r => pathname.startsWith(r));
       const isAuthenticatedRoute = protectedRoutes.authenticated.some(r => pathname.startsWith(r));
 
       if (isAdminRoute && role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
@@ -44,6 +46,10 @@ export async function proxy(request: NextRequest) {
       }
 
       if (isOrgRoute && role !== 'ORGANISATION') {
+        return NextResponse.redirect(new URL('/feed', request.url));
+      }
+
+      if (isUserRoute && role !== 'USER' && role !== 'DONOR') {
         return NextResponse.redirect(new URL('/feed', request.url));
       }
 

@@ -40,7 +40,7 @@ const nextConfig = {
     return [
       {
         source: '/api/v1/:path*',
-        destination: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000/api/v1/:path*',
+        destination: process.env.BASE_URL ? `${process.env.BASE_URL}/:path*` : 'http://localhost:5000/api/v1/:path*',
       },
     ];
   },

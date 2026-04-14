@@ -1,7 +1,9 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api/v1";
+  typeof window !== "undefined"
+    ? `${window.location.origin}/api/v1`
+    : "/api/v1";
 
 // ---------- In-Memory Token Store ----------
 let inMemoryAccessToken: string | null = null;

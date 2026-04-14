@@ -20,8 +20,16 @@ const BLOOD_GROUPS: { label: string; value: BloodGroup }[] = [
   { label: "O-", value: "O_NEGATIVE" },
 ];
 
+export interface DonorFilterValues {
+  searchTerm?: string;
+  bloodGroup?: string;
+  division?: string;
+  district?: string;
+  upazila?: string;
+}
+
 interface DonorSearchFilterProps {
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: DonorFilterValues) => void;
   isFetching?: boolean;
 }
 
