@@ -16,8 +16,9 @@ import {
   Users,
   Settings as SettingsIcon
 } from "lucide-react";
-import { Button } from "../ui/button";
 import ThemeToggle from "./ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { useAuthContext } from "@/providers/AuthProvider";
 
 const navLinks = [
@@ -85,6 +86,7 @@ export default function Navbar() {
 
         {/* Desktop Right */}
         <div className="hidden md:flex items-center gap-2">
+          {isAuthenticated && user && <NotificationBell />}
           <ThemeToggle />
 
           {isAuthenticated && user ? (
@@ -255,16 +257,20 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Right */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex items-center gap-3 md:hidden">
+          {isAuthenticated && user && <NotificationBell />}
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
+            className="rounded-md p-2 text-muted-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary z-50 relative"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+            <span className="sr-only">Open main menu</span>
+            {mobileOpen ? (
+              <X className="block h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Menu className="block h-6 w-6" aria-hidden="true" />
+            )}
+          </button>
         </div>
       </nav>
 

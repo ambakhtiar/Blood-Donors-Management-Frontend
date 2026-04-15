@@ -84,7 +84,7 @@ export function ManagePostsTable() {
     mutationFn: ({ id }: { id: string; currentState: boolean }) => approvePost(id),
     onSuccess: (res, variables) => {
       variables.currentState
-        ? toast.warning("Post approval withdrawn successfully")
+        ? toast.error("Post approval withdrawn successfully")
         : toast.success("Post approved successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
       setPendingAction(null);
@@ -99,7 +99,7 @@ export function ManagePostsTable() {
     mutationFn: ({ id }: { id: string; currentState: boolean }) => verifyPost(id),
     onSuccess: (res, variables) => {
       variables.currentState
-        ? toast.warning("Post verification removed successfully")
+        ? toast.error("Post verification removed successfully")
         : toast.success("Post verified successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
       setPendingAction(null);
@@ -115,7 +115,7 @@ export function ManagePostsTable() {
     onSuccess: (res, variables) => {
       variables.currentState
         ? toast.success("Post restored successfully")
-        : toast.warning("Post deleted successfully");
+        : toast.error("Post deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
       setPendingAction(null);
     },
@@ -227,16 +227,16 @@ export function ManagePostsTable() {
         </Select>
       </div>
 
-      {/* Table */}
-      <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
+      {/* Desktop Table View */}
+      <div className="hidden lg:block rounded-xl border bg-card overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/40">
-              <TableHead className="font-semibold">Post</TableHead>
+              <TableHead className="font-semibold">Post Details</TableHead>
               <TableHead className="font-semibold">Location</TableHead>
               <TableHead className="font-semibold text-center">Approved</TableHead>
               <TableHead className="font-semibold text-center">Verified</TableHead>
-              <TableHead className="font-semibold text-center">Visibility</TableHead>
+              <TableHead className="font-semibold text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -255,113 +255,96 @@ export function ManagePostsTable() {
                     post.isDeleted && "opacity-50 bg-muted/30"
                   )}
                 >
-                  {/* Post Info */}
-                  <TableCell className="max-w-[280px]">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-[10px] font-normal shrink-0">
+                  <TableCell className="min-w-[400px]">
+                    <div className="flex flex-col gap-2 py-2">
+                       <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-[10px] font-bold px-2 py-0">
                           {postTypeDisplayMap[post.type as PostType] || post.type}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 shrink-0">
-                          <Clock className="h-2.5 w-2.5" />
+                        <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
                           {format(new Date(post.createdAt), "MMM d, yyyy")}
                         </span>
                       </div>
                       <Link
                         href={`/feed/${post.id}`}
                         target="_blank"
-                        className="font-semibold text-sm text-foreground hover:text-primary transition-colors line-clamp-1"
+                        className="font-bold text-base text-foreground hover:text-primary transition-colors line-clamp-1"
                       >
                         {post.title || "Untitled Post"}
                       </Link>
-                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <User className="h-3 w-3" />
-                        ID: {post.id.slice(-8).toUpperCase()}
-                      </div>
+                      
+                      {/* Donation Progress - Full width of this cell */}
+                      {post.type === PostType.HELPING && (
+                        <div className="mt-2 w-full bg-blue-50/50 dark:bg-blue-950/20 rounded-xl p-3 border border-blue-100 dark:border-blue-900/40">
+                           <div className="flex justify-between items-center mb-2">
+                            <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">৳{post.raisedAmount?.toLocaleString()} raised</span>
+                            <span className="text-[10px] text-muted-foreground">Target: ৳{post.targetAmount?.toLocaleString()}</span>
+                          </div>
+                          <div className="h-2 w-full bg-blue-100 dark:bg-blue-900/50 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-600 transition-all duration-700"
+                              style={{ width: `${Math.min(((post.raisedAmount || 0) / (post.targetAmount || 1)) * 100, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TableCell>
 
-                  {/* Location */}
                   <TableCell>
-                    <div className="flex flex-col text-xs gap-0.5">
-                      <div className="flex items-center gap-1 text-foreground font-medium">
-                        <MapPin className="h-3 w-3 text-primary shrink-0" />
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                        <MapPin className="h-3.5 w-3.5 text-primary" />
                         {post.upazila}, {post.district}
                       </div>
-                      <span className="text-muted-foreground pl-4">{post.division}</span>
+                      <span className="text-[10px] text-muted-foreground pl-5 uppercase tracking-tighter font-semibold">{post.division}</span>
                     </div>
                   </TableCell>
 
-                  {/* Approve Toggle */}
                   <TableCell className="text-center">
                     <Button
                       variant={post.isApproved ? "default" : "outline"}
                       size="sm"
                       className={cn(
-                        "h-9 px-4 gap-2 text-xs font-semibold rounded-lg transition-all duration-200",
-                        post.isApproved
-                          ? "bg-green-600 hover:bg-green-700 text-white border-transparent shadow-md shadow-green-500/20"
-                          : "border-amber-400 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950"
+                        "h-8 px-3 gap-1.5 text-[10px] font-bold rounded-full",
+                        post.isApproved ? "bg-green-600 hover:bg-green-700" : "border-amber-500 text-amber-600"
                       )}
                       onClick={() => setPendingAction({ type: "approve", postId: post.id, currentState: post.isApproved })}
-                      disabled={isAnyPending}
                     >
-                      {post.isApproved ? (
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                      ) : (
-                        <ShieldOff className="h-3.5 w-3.5" />
-                      )}
+                      {post.isApproved ? <ShieldCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
                       {post.isApproved ? "Approved" : "Pending"}
                     </Button>
                   </TableCell>
 
-                  {/* Verify Toggle */}
                   <TableCell className="text-center">
                     {post.type === PostType.HELPING ? (
                       <Button
                         variant={post.isVerified ? "default" : "outline"}
                         size="sm"
                         className={cn(
-                          "h-9 px-4 gap-2 text-xs font-semibold rounded-lg transition-all duration-200",
-                          post.isVerified
-                            ? "bg-blue-600 hover:bg-blue-700 text-white border-transparent shadow-md shadow-blue-500/20"
-                            : "border-blue-300 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
+                          "h-8 px-3 gap-1.5 text-[10px] font-bold rounded-full",
+                          post.isVerified ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-500"
                         )}
                         onClick={() => setPendingAction({ type: "verify", postId: post.id, currentState: post.isVerified })}
-                        disabled={isAnyPending}
                       >
-                        {post.isVerified ? (
-                          <BadgeCheck className="h-3.5 w-3.5" />
-                        ) : (
-                          <BadgeX className="h-3.5 w-3.5" />
-                        )}
-                        {post.isVerified ? "Verified" : "Unverified"}
+                        {post.isVerified ? <BadgeCheck className="h-3 w-3" /> : <BadgeX className="h-3 w-3" />}
+                        {post.isVerified ? "Verified" : "Verify"}
                       </Button>
-                    ) : (
-                      <span className="text-xs text-muted-foreground italic">N/A</span>
-                    )}
+                    ) : "-"}
                   </TableCell>
 
-                  {/* Delete/Restore Toggle */}
                   <TableCell className="text-center">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       className={cn(
-                        "h-9 px-4 gap-2 text-xs font-semibold rounded-lg transition-all duration-200",
-                        post.isDeleted
-                          ? "border-green-400 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
-                          : "border-red-300 text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                        "h-8 w-8 p-0 rounded-full",
+                        post.isDeleted ? "text-green-600" : "text-destructive"
                       )}
                       onClick={() => setPendingAction({ type: "delete", postId: post.id, currentState: post.isDeleted })}
-                      disabled={isAnyPending}
                     >
-                      {post.isDeleted ? (
-                        <Eye className="h-3.5 w-3.5" />
-                      ) : (
-                        <EyeOff className="h-3.5 w-3.5" />
-                      )}
-                      {post.isDeleted ? "Restore" : "Delete"}
+                      {post.isDeleted ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -369,6 +352,93 @@ export function ManagePostsTable() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-4">
+        {posts.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground bg-card rounded-xl border">No posts found.</div>
+        ) : (
+          posts.map((post: any) => (
+            <div 
+              key={post.id} 
+              className={cn(
+                "bg-card rounded-2xl border p-5 shadow-sm space-y-4",
+                post.isDeleted && "opacity-60 bg-muted/40 grayscale-[0.5]"
+              )}
+            >
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest">
+                    {postTypeDisplayMap[post.type as PostType] || post.type}
+                  </Badge>
+                  <Link href={`/feed/${post.id}`} target="_blank" className="block text-base font-black leading-tight hover:text-primary transition-colors">
+                    {post.title}
+                  </Link>
+                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold">
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {format(new Date(post.createdAt), "MMM d, yyyy")}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {post.district}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                   <Badge variant={post.isApproved ? "success" : "warning"} className="text-[8px]">
+                    {post.isApproved ? "Approved" : "Pending"}
+                   </Badge>
+                   {post.type === PostType.HELPING && (
+                     <Badge variant={post.isVerified ? "info" : "outline"} className="text-[8px]">
+                      {post.isVerified ? "Verified" : "Unverified"}
+                     </Badge>
+                   )}
+                </div>
+              </div>
+
+              {/* Progress Bar - TRUE FULL WIDTH within the card */}
+              {post.type === PostType.HELPING && (
+                <div className="pt-2">
+                   <div className="flex justify-between items-end mb-2 px-1">
+                    <span className="text-sm font-black text-blue-600">৳{post.raisedAmount?.toLocaleString()}</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">Target ৳{post.targetAmount?.toLocaleString()}</span>
+                   </div>
+                   <div className="h-3 w-full bg-blue-100 dark:bg-blue-900/50 rounded-full overflow-hidden shadow-inner">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-1000 shadow-[0_0_10px_rgba(37,99,235,0.4)]"
+                        style={{ width: `${Math.min(((post.raisedAmount || 0) / (post.targetAmount || 1)) * 100, 100)}%` }}
+                      />
+                   </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className={cn("h-10 text-[10px] font-bold rounded-xl", post.isApproved ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200")}
+                  onClick={() => setPendingAction({ type: "approve", postId: post.id, currentState: post.isApproved })}
+                >
+                  {post.isApproved ? "Unapprove" : "Approve"}
+                </Button>
+                {post.type === PostType.HELPING && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={cn("h-10 text-[10px] font-bold rounded-xl", post.isVerified ? "bg-blue-50 text-blue-700 border-blue-200" : "hover:bg-blue-50")}
+                    onClick={() => setPendingAction({ type: "verify", postId: post.id, currentState: post.isVerified })}
+                  >
+                    {post.isVerified ? "Unverify" : "Verify"}
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className={cn("h-10 text-[10px] font-bold rounded-xl", post.isDeleted ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700 border-red-200")}
+                  onClick={() => setPendingAction({ type: "delete", postId: post.id, currentState: post.isDeleted })}
+                >
+                  {post.isDeleted ? "Restore" : "Delete"}
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Pagination */}

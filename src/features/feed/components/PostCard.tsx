@@ -44,6 +44,8 @@ import {
 import { deletePost, resolvePost } from "@/services/post.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditPostModal } from "./EditPostModal";
+import { DonateFundsModal } from "@/features/payments/components/DonateFundsModal";
+import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import { formatDistanceToNow, format } from "date-fns";
 import { LikeAction } from "./LikeAction";
@@ -232,6 +234,7 @@ export function PostCard({ post }: PostCardProps) {
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDonateOpen, setIsDonateOpen] = useState(false);
 
   // Mutation for deleting a post
   const deleteMutation = useMutation({
@@ -539,23 +542,40 @@ export function PostCard({ post }: PostCardProps) {
           )}
         </div>
 
-        {/* Financial Block for Helping (Kept slightly distinct for gravity) */}
-        {post.targetAmount && (
-          <div className="flex items-center justify-between gap-2 text-sm bg-blue-50/50 text-blue-800 dark:bg-blue-950/20 dark:text-blue-300 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50 mt-2">
-            <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              <span className="font-medium">Target Amount:</span>
+        {/* Crowdfunding block for HELPING posts */}
+        {post.type === "HELPING" && post.isApproved && post.isVerified && post.targetAmount && post.targetAmount > 0 && (
+          <div className="mt-2 space-y-3">
+            {/* Progress bar */}
+            <div className="bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/50 rounded-xl p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-blue-700 dark:text-blue-300">
+                  ৳{(post.raisedAmount ?? 0).toLocaleString()} raised
+                </span>
+                <span className="text-muted-foreground text-xs">
+                  of ৳{post.targetAmount.toLocaleString()}
+                </span>
+              </div>
+              <Progress
+                value={Math.min(((post.raisedAmount ?? 0) / post.targetAmount) * 100, 100)}
+                className="h-2 bg-blue-100 dark:bg-blue-900 [&>div]:bg-blue-600"
+              />
+              <p className="text-[11px] text-blue-600/70 dark:text-blue-400">
+                {Math.round(((post.raisedAmount ?? 0) / post.targetAmount) * 100)}% funded
+              </p>
             </div>
-            <div className="text-right font-bold">
-              <span>৳{post.targetAmount.toLocaleString()}</span>
-              {post.raisedAmount > 0 && (
-                <p className="text-[11px] font-normal text-blue-600/80">৳{post.raisedAmount.toLocaleString()} raised</p>
-              )}
-            </div>
+
+            {/* Donate Now button */}
+            <Button
+              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-sm"
+              onClick={(e) => { e.stopPropagation(); setIsDonateOpen(true); }}
+            >
+              <Heart className="w-4 h-4 fill-white" />
+              Donate Now — SSLCommerz
+            </Button>
           </div>
         )}
 
-        {/* Payment Logic */}
+        {/* bKash/Nagad manual block */}
         {post.bkashNagadNumber && post.isVerified && (
           <div className="flex flex-col gap-2 mt-2">
             <div className="flex items-center gap-3 text-sm text-foreground bg-pink-50/50 dark:bg-pink-950/20 p-3 rounded-lg border border-pink-100 dark:border-pink-900/50">
@@ -566,14 +586,10 @@ export function PostCard({ post }: PostCardProps) {
                   <span className="font-bold">{post.bkashNagadNumber}</span>
                 </span>
                 <span className="text-[11px] text-pink-700/80 dark:text-pink-400 mt-1 leading-tight font-medium">
-                  NB: If you send money in bKash/Nagad, this time not update rising money.
+                  NB: Manual transfers will not auto-update the raised amount.
                 </span>
               </div>
             </div>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 shadow-none transition-all">
-              <Wallet className="w-4 h-4 mr-2" />
-              Go to Payment Method
-            </Button>
           </div>
         )}
 
@@ -628,12 +644,22 @@ export function PostCard({ post }: PostCardProps) {
 
       {/* Edit Post Modal */}
       {isEditModalOpen && (
-        <EditPostModal 
+        <EditPostModal
           post={post}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
         />
       )}
+
+      {/* Donate Funds Modal */}
+      <DonateFundsModal
+        isOpen={isDonateOpen}
+        onClose={() => setIsDonateOpen(false)}
+        postId={post.id}
+        postTitle={post.title}
+        targetAmount={post.targetAmount}
+        raisedAmount={post.raisedAmount ?? 0}
+      />
     </Card>
   );
 }

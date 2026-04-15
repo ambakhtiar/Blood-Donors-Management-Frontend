@@ -52,7 +52,12 @@ export default function AdminSidebar({ className, onClose }: AdminSidebarProps) 
         <div className="px-3 py-2">
           <div className="flex items-center gap-2 px-4 mb-8">
             <Heart className="h-6 w-6 text-primary filled-primary" />
-            <span className="text-xl font-bold tracking-tight">BloodLink Admin</span>
+            <span className="text-xl font-bold tracking-tight">
+              BloodLink{" "}
+              <span className="text-primary/80 text-sm block md:inline font-black uppercase tracking-tighter">
+                {user?.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
+              </span>
+            </span>
           </div>
           <div className="space-y-1">
             {mainNavItems.map((item) => (

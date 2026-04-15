@@ -9,6 +9,7 @@ import {
   LogOut,
   Settings
 } from "lucide-react";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -47,40 +48,41 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center gap-2 border-b bg-background px-4 md:px-6">
       <Button
-        variant="outline"
+        variant="ghost"
         size="icon"
-        className="shrink-0 md:hidden"
+        className="shrink-0 md:hidden -ml-2"
         onClick={onMenuClick}
       >
         <Menu className="h-5 w-5" />
         <span className="sr-only">Toggle navigation menu</span>
       </Button>
 
-      <div className="flex flex-1 items-center gap-4 md:gap-8">
-        <h1 className="text-lg font-semibold md:text-xl capitalize">
+      <div className="flex flex-1 items-center gap-2 md:gap-4">
+        <h1 className="text-sm font-bold md:text-xl capitalize truncate max-w-[120px] sm:max-w-none">
           {getPageTitle(pathname)}
         </h1>
-        <div className="ml-auto flex-1 md:grow-0">
+        <div className="ml-auto flex-1 md:grow-0 hidden lg:block">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search..."
-              className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+              className="w-full rounded-lg bg-background pl-8 lg:w-[320px]"
             />
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-1 md:gap-2">
+        <div className="lg:hidden">
+          <Button variant="ghost" size="icon">
+            <Search className="h-5 w-5" />
+          </Button>
+        </div>
         <ModeToggle />
-        
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
-        </Button>
+        <NotificationBell />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -93,7 +95,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{user?.role}</p>
-                <p className="text-xs leading-none text-muted-foreground italic">
+                <p className="text-xs leading-none text-muted-foreground italic truncate">
                   {user?.email}
                 </p>
               </div>
