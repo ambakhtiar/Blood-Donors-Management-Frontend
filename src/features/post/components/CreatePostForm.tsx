@@ -4,7 +4,8 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Plus, X, AlertTriangle, Clock, Heart, HandHelping, MapPin, Search, UserCheck, UserX } from "lucide-react";
+import { Loader2, AlertTriangle, Clock, Heart, HandHelping, MapPin, Search, UserCheck, UserX } from "lucide-react";
+import ImageUploader from "@/components/shared/ImageUploader";
 import { createPostSchema, type CreatePostFormValues } from "@/validations/post.validation";
 import { createPost, checkDonorByPhone } from "@/services/post.service";
 import { getDivisions, getDistricts, getUpazilas } from "@/lib/bd-location";
@@ -109,7 +110,7 @@ export function CreatePostForm() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [newImageUrl, setNewImageUrl] = useState("");
+
   const [donationTarget, setDonationTarget] = useState<"SELF" | "OTHER">("SELF");
 
   // ── Donor Lookup State (for BLOOD_DONATION OTHER mode) ────────────────────
@@ -294,28 +295,8 @@ export function CreatePostForm() {
     }
   }, [form.type, user, donationTarget, handleChange]);
 
-  // ── Image Management (max 5 images) ────────────────────────────────────────
-  const MAX_IMAGES = 5;
-
-  const addImage = useCallback(() => {
-    if (!newImageUrl.trim()) return;
-    if (form.images.length >= MAX_IMAGES) {
-      toast.error(`Maximum ${MAX_IMAGES} images allowed.`);
-      return;
-    }
-    setForm((prev) => ({
-      ...prev,
-      images: [...prev.images, newImageUrl.trim()],
-    }));
-    setNewImageUrl("");
-  }, [newImageUrl, form.images.length]);
-
-  const removeImage = useCallback((index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-  }, []);
+  // ── Image limit ────────────────────────────────────────────────────────────
+  const MAX_IMAGES = 3;
 
   // ── Mutation ─────────────────────────────────────────────────────────────
   const mutation = useMutation({
@@ -340,13 +321,7 @@ export function CreatePostForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Auto-append pending image URL if exists
-    let finalImages = [...form.images];
-    if (newImageUrl.trim() && finalImages.length < MAX_IMAGES) {
-      finalImages.push(newImageUrl.trim());
-    }
-
-    const payload = { ...buildPayload(), images: finalImages.filter(url => url.trim() !== "") };
+    const payload = { ...buildPayload(), images: form.images.filter(url => url.trim() !== "") };
     const result = createPostSchema.safeParse(payload);
 
     if (!result.success) {
@@ -1092,78 +1067,15 @@ export function CreatePostForm() {
 
         {/* ════════════════ Images Section ════════════════ */}
         <div className="space-y-3 sm:col-span-2 border-t pt-4 mt-1">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">
-              Images <span className="text-muted-foreground text-xs">(optional)</span>
-            </p>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              form.images.length >= MAX_IMAGES
-                ? "bg-destructive/10 text-destructive"
-                : "bg-muted text-muted-foreground"
-            }`}>
-              {form.images.length}/{MAX_IMAGES}
-            </span>
-          </div>
-
-          {/* Existing Images */}
-          {form.images.length > 0 && (
-            <div className="space-y-2">
-              {form.images.map((url, index) => (
-                <div key={index} className="flex items-center gap-2 group animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="flex items-center gap-2 flex-1 px-3 py-2 bg-muted/30 hover:bg-muted/50 rounded-md text-xs text-muted-foreground truncate border border-dashed hover:border-solid transition-all">
-                    <span className="text-[10px] font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 shrink-0 ring-1 ring-primary/20">
-                      {index + 1}
-                    </span>
-                    <span className="truncate font-mono">{url}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Add Image Input */}
-          {form.images.length < MAX_IMAGES ? (
-            <div className="flex gap-2">
-              <input
-                type="url"
-                placeholder="Paste an image URL here..."
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addImage();
-                  }
-                }}
-                className={`${inputClass} flex-1`}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addImage}
-                disabled={!newImageUrl.trim()}
-                className="h-10 px-3"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                Add
-              </Button>
-            </div>
-          ) : (
-            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/30 rounded-lg p-2.5">
-              Maximum {MAX_IMAGES} images reached. Remove an image to add a new one.
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground">
-            Supported: Unsplash, Pexels, Cloudinary, Pinterest links
+          <p className="text-sm font-medium">
+            Images{" "}
+            <span className="text-muted-foreground text-xs">(optional · max {MAX_IMAGES})</span>
           </p>
+          <ImageUploader
+            value={form.images}
+            onChange={(urls) => setForm((prev) => ({ ...prev, images: urls }))}
+            disabled={mutation.isPending}
+          />
         </div>
       </div>
 

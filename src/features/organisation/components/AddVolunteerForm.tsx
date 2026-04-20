@@ -120,8 +120,9 @@ export default function AddVolunteerForm() {
       return;
     }
 
-    const payload: IAddVolunteerPayload = {
+    const payload = {
       contactNumber,
+      isAvailable: true,
       ...(donorInfo && !donorInfo.found && {
         name: name.trim(),
         bloodGroup: bloodGroup as BloodGroup,
@@ -132,7 +133,7 @@ export default function AddVolunteerForm() {
       }),
     };
 
-    mutation.mutate(payload);
+    mutation.mutate(payload as IAddVolunteerPayload);
   };
 
   return (
@@ -198,9 +199,9 @@ export default function AddVolunteerForm() {
               <span className="bg-white dark:bg-green-900/20 rounded px-2 py-1 border border-green-200 dark:border-green-800/30 font-medium">
                 {donorInfo.gender === "FEMALE" ? "♀️ Female" : "♂️ Male"}
               </span>
-              {donorInfo.district && (
+              {(donorInfo as any).district && (
                 <span className="bg-white dark:bg-green-900/20 rounded px-2 py-1 border border-green-200 dark:border-green-800/30 font-medium">
-                  📍 {donorInfo.district}
+                  📍 {(donorInfo as any).district}
                 </span>
               )}
             </div>

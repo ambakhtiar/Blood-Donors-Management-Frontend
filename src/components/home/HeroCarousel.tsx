@@ -23,7 +23,7 @@ const slides = [
     subtitle:
       "Every drop counts. Join thousands of donors who are making a difference across everyone's life.",
     cta: { label: "Find Blood", href: "/feed?type=BLOOD_FINDING", icon: Search },
-    ctaSecondary: { label: "Become a Donor", href: "/register" },
+    ctaSecondary: { label: "Become a Donor", href: "/auth/register" },
     gradient:
       "from-primary/20 via-background to-background dark:from-primary/15 dark:via-background dark:to-background",
     accentGlow: "bg-primary/20 dark:bg-primary/10",
@@ -43,7 +43,7 @@ const slides = [
     title: "Support Patients Financially",
     subtitle:
       "Help those who cannot afford medical treatment. Your generous contribution can change a life forever.",
-    cta: { label: "Donate Funds", href: "/campaigns", icon: HandHeart },
+    cta: { label: "Donate Funds", href: "/feed?type=HELPING", icon: HandHeart },
     ctaSecondary: { label: "Start a Campaign", href: "/feed?type=HELPING" },
     gradient:
       "from-destructive/20 via-background to-background dark:from-destructive/15 dark:via-background dark:to-background",
@@ -64,7 +64,7 @@ const slides = [
     title: "Hospitals & Organisations",
     subtitle:
       "Register your institution. Track verifiable donations, manage volunteers, and build a stronger network.",
-    cta: { label: "Register Now", href: "/register", icon: ShieldPlus },
+    cta: { label: "Register Now", href: "/auth/register", icon: ShieldPlus },
     ctaSecondary: { label: "Learn More", href: "/about" },
     gradient:
       "from-chart-4/20 via-background to-background dark:from-chart-4/15 dark:via-background dark:to-background",
@@ -120,14 +120,14 @@ export default function HeroCarousel() {
 
       {/* Main Content Container */}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-10 lg:gap-8 items-center min-h-[10rem] lg:min-h-[15rem]">
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-8 items-start md:items-center min-h-[26rem] sm:min-h-[22.5rem] md:min-h-[auto]">
 
           {/* Left Text Content */}
-          <div className="flex flex-col justify-center space-y-6 md:space-y-7 z-10 py-6 min-h-[24rem] sm:min-h-[22rem] lg:min-h-[24rem]">
+          <div className="flex flex-col justify-start space-y-6 md:space-y-7 z-10 pt-6 pb-2 sm:pt-8 md:pt-12 h-[26rem] sm:h-[22.5rem] md:h-auto">
             {/* Badge */}
             <div
               key={`badge-${slide.id}`}
-              className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+              className="animate-in fade-in slide-in-from-bottom-4 duration-700 h-8"
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/60 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold shadow-sm">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
@@ -137,18 +137,22 @@ export default function HeroCarousel() {
 
             {/* Typography */}
             <div className="space-y-3">
-              <h1
-                key={`title-${slide.id}`}
-                className="animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground drop-shadow-sm leading-tight"
-              >
-                {slide.title}
-              </h1>
-              <p
-                key={`sub-${slide.id}`}
-                className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 text-base sm:text-lg text-muted-foreground max-w-lg leading-relaxed"
-              >
-                {slide.subtitle}
-              </p>
+              <div className="h-[5.5rem] sm:h-[6.5rem] md:h-[8rem] lg:h-[9rem] flex flex-col justify-end">
+                <h1
+                  key={`title-${slide.id}`}
+                  className="animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground drop-shadow-sm leading-tight"
+                >
+                  {slide.title}
+                </h1>
+              </div>
+              <div className="h-[4.5rem] sm:h-[4rem] md:h-[5rem] lg:h-[5rem]">
+                <p
+                  key={`sub-${slide.id}`}
+                  className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 text-base sm:text-lg text-muted-foreground max-w-lg leading-relaxed"
+                >
+                  {slide.subtitle}
+                </p>
+              </div>
             </div>
 
             {/* CTAs */}
@@ -179,7 +183,7 @@ export default function HeroCarousel() {
         </div>
 
         {/* Custom Navigation Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-2 border-t border-border/40 pt-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-2 border-t border-border/40 pt-4">
 
           {/* Progress/Dots Wrapper */}
           <div className="flex items-center gap-3 bg-background/30 backdrop-blur-sm p-2 rounded-full border border-border/50">

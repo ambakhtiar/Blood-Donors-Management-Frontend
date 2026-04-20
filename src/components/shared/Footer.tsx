@@ -35,13 +35,13 @@ export default function Footer() {
 
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <Button size="lg" className="rounded-full px-8 h-12 shadow-primary/20 shadow-lg group">
-                  <Link href="/register" className="flex items-center gap-2">
+                  <Link href="/auth/register" className="flex items-center gap-2">
                     Become a Donor
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="secondary" className="rounded-full px-8 h-12 group border border-border">
-                  <Link href="/campaigns" className="flex items-center gap-2">
+                  <Link href="/feed?type=HELPING" className="flex items-center gap-2">
                     Donate Funds
                     <Heart className="h-4 w-4 text-destructive transition-transform group-hover:scale-110" />
                   </Link>
@@ -60,7 +60,7 @@ export default function Footer() {
                 <ul className="space-y-3">
                   {[
                     { href: "/feed", label: "Blood Feed" },
-                    { href: "/campaigns", label: "Crowdfunding Campaigns" },
+                    { href: "/feed?type=HELPING", label: "Crowdfunding Campaigns" },
                     { href: "/about", label: "About Our Mission" },
                     { href: "/privacy", label: "Privacy Policy" },
                   ].map((link) => (
@@ -83,8 +83,8 @@ export default function Footer() {
                 </h3>
                 <ul className="space-y-3">
                   {[
-                    { href: "/register", label: "Register Hospital" },
-                    { href: "/register", label: "Register NGO/Organisation" },
+                    { href: "/auth/register", label: "Register Hospital" },
+                    { href: "/auth/register", label: "Register NGO/Organisation" },
                     { href: "/about", label: "How It Works" },
                     { href: "/about", label: "Partner With Us" },
                   ].map((link, i) => (

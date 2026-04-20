@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Loader2, Save, User as UserIcon, Weight, MapPin, Building2, Users } from "lucide-react";
+import { X, Loader2, Save, User as UserIcon, Weight, MapPin, Building2, Users, Camera } from "lucide-react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { updateProfileSchema, type UpdateProfileFormValues } from "@/validations/user.validation";
 import { updateMyProfile } from "@/services/user.service";
+import { uploadImage } from "@/services/upload.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { IUser } from "@/types";
@@ -27,6 +28,8 @@ export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProp
   const { setUser } = useAuthContext();
   const [districts, setDistricts] = useState<string[]>([]);
   const [upazilas, setUpazilas] = useState<string[]>([]);
+  const [isUploadingPic, setIsUploadingPic] = useState(false);
+  const picInputRef = useRef<HTMLInputElement>(null);
 
   // Manual Form State
   const [formData, setFormData] = useState<UpdateProfileFormValues>({
@@ -164,13 +167,19 @@ export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProp
             </div>
             
             <div className="md:col-span-2 space-y-4 bg-primary/5 p-4 rounded-xl border border-primary/10">
-               <label className={labelClass}>Profile Picture URL</label>
+               <label className={labelClass}>Profile Picture</label>
                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 rounded-full bg-background border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                  {/* Avatar preview — click to upload */}
+                  <button
+                    type="button"
+                    onClick={() => !isUploadingPic && picInputRef.current?.click()}
+                    className="relative h-16 w-16 rounded-full bg-background border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group hover:border-primary/60 transition-colors"
+                    title="Click to change photo"
+                  >
                     {formData.profilePictureUrl ? (
-                      <img 
-                        src={formData.profilePictureUrl} 
-                        alt="Preview" 
+                      <img
+                        src={formData.profilePictureUrl}
+                        alt="Preview"
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=User&background=random';
@@ -179,15 +188,47 @@ export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProp
                     ) : (
                       <UserIcon className="w-8 h-8 text-muted-foreground" />
                     )}
-                  </div>
+                    {/* Overlay */}
+                    {isUploadingPic ? (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+                        <Loader2 className="w-5 h-5 text-white animate-spin" />
+                      </div>
+                    ) : (
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center rounded-full transition-all">
+                        <Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    )}
+                  </button>
+
+                  <input
+                    ref={picInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 5 * 1024 * 1024) {
+                        toast.error("Image must be under 5MB");
+                        return;
+                      }
+                      setIsUploadingPic(true);
+                      try {
+                        const url = await uploadImage(file);
+                        handleChange("profilePictureUrl", url);
+                        toast.success("Photo uploaded!");
+                      } catch {
+                        toast.error("Upload failed. Please try again.");
+                      } finally {
+                        setIsUploadingPic(false);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+
                   <div className="flex-1 space-y-1">
-                    <Input 
-                      value={formData.profilePictureUrl || ""} 
-                      onChange={(e) => handleChange("profilePictureUrl", e.target.value)} 
-                      placeholder="https://images.unsplash.com/photo-..." 
-                      className="bg-card"
-                    />
-                    <p className="text-[10px] text-muted-foreground">Enter a direct image URL (JPG, PNG or WEBP)</p>
+                    <p className="text-sm font-medium text-foreground">Click the avatar to upload a new photo</p>
+                    <p className="text-[11px] text-muted-foreground">JPEG, PNG, WebP · max 5MB · uploads securely to Cloudinary</p>
                   </div>
                </div>
                {formErrors["profilePictureUrl"] && <p className="text-xs text-destructive mt-1">{formErrors["profilePictureUrl"]}</p>}

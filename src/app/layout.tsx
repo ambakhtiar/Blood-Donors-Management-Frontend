@@ -12,7 +12,7 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: {
-    default: `${process.env.NEXT_PUBLIC_APP_NAME_FF}${process.env.NEXT_PUBLIC_APP_NAME_SS} — Blood Donors Management System`,
+    default: `${process.env.NEXT_PUBLIC_APP_NAME_FF}${process.env.NEXT_PUBLIC_APP_NAME_SS} — Blood Donation and Crowd Management`,
     template: `%s | ${process.env.NEXT_PUBLIC_APP_NAME_FF}${process.env.NEXT_PUBLIC_APP_NAME_SS}`,
   },
   description:
@@ -32,7 +32,7 @@ export default function RootLayout({
             {children}
           </PasswordChangeGuard>
         </AppProviders>
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" duration={3000} closeButton />
       </body>
     </html>
   );

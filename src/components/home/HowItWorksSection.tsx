@@ -27,7 +27,7 @@ const roles = [
       { icon: FileText, label: "Create blood-finding posts" },
       { icon: HandHeart, label: "Fund medical campaigns" },
     ],
-    cta: { label: "Register as Donor", href: "/register" },
+    cta: { label: "Register as Donor", href: "/auth/register" },
   },
   {
     icon: Building2,
@@ -40,7 +40,7 @@ const roles = [
       { icon: Send, label: "Send consent requests" },
       { icon: Droplets, label: "Manage blood bank data" },
     ],
-    cta: { label: "Register Hospital", href: "/register" },
+    cta: { label: "Register Hospital", href: "/auth/register" },
   },
   {
     icon: Landmark,
@@ -53,7 +53,7 @@ const roles = [
       { icon: MapPinned, label: "Track area-wise donors" },
       { icon: ClipboardCheck, label: "Coordinate blood drives" },
     ],
-    cta: { label: "Register Organisation", href: "/register" },
+    cta: { label: "Register Organisation", href: "/auth/register" },
   },
 ];
 
