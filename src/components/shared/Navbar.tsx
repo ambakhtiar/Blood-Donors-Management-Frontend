@@ -14,6 +14,10 @@ import {
   ClipboardList,
   UserPlus,
   Users,
+  Home,
+  Activity,
+  Search,
+  Info,
   Settings as SettingsIcon
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
@@ -22,10 +26,10 @@ import { NotificationBell } from "@/features/notifications/components/Notificati
 import { useAuthContext } from "@/providers/AuthProvider";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/feed", label: "Feed" },
-  { href: "/donors", label: "Search Donors" },
-  { href: "/about", label: "About" },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/feed", label: "Feed", icon: Activity },
+  { href: "/donors", label: "Donors", icon: Search },
+  { href: "/about", label: "About", icon: Info },
 ];
 
 // Helper: get display name from user profile
@@ -64,7 +68,7 @@ export default function Navbar() {
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105 shadow-sm">
             <Droplets className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold tracking-tight">
@@ -73,22 +77,21 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Links */}
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden md:flex items-center gap-2">
           {navLinks.map((link) => {
             const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            const Icon = link.icon;
             return (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-md ${isActive
-                    ? "text-primary bg-primary/10 font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  className={`relative flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-xl group ${isActive
+                    ? "text-primary bg-primary/10 shadow-[0_2px_10px_rgba(var(--primary),0.1)] ring-1 ring-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                     }`}
                 >
+                  <Icon className={`h-4 w-4 transition-transform group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
                   {link.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-t-lg" />
-                  )}
                 </Link>
               </li>
             );
@@ -291,16 +294,20 @@ export default function Navbar() {
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => {
               const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+              const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block rounded-lg px-4 py-3 text-sm font-medium transition-colors ${isActive
-                    ? "bg-primary/10 text-primary font-bold border-l-4 border-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground border-l-4 border-transparent"
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition-all duration-200 ${isActive
+                    ? "bg-primary/10 text-primary shadow-[0_2px_10px_rgba(var(--primary),0.05)] ring-1 ring-primary/10"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
                     }`}
                   onClick={() => setMobileOpen(false)}
                 >
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                    <Icon className="h-4.5 w-4.5" />
+                  </div>
                   {link.label}
                 </Link>
               );

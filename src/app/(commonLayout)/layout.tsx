@@ -13,7 +13,7 @@ export default function CommonLayout({ children }: { children: ReactNode }) {
     <>
       <Navbar />
       <div className="flex-1">{children}</div>
-      {isHomePage && <Footer />}
+      {(isHomePage || pathname === "/about") && <Footer />}
     </>
   );
 }
