@@ -19,7 +19,7 @@ export type BloodGroup = typeof BloodGroup[keyof typeof BloodGroup];
 export const PostType = {
   BLOOD_FINDING: "BLOOD_FINDING",
   BLOOD_DONATION: "BLOOD_DONATION",
-  HELPING: "HELPING",
+  HELPING: "HELPING"
 } as const;
 export type PostType = typeof PostType[keyof typeof PostType];
 

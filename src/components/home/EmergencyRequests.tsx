@@ -41,7 +41,7 @@ export default function EmergencyRequests() {
         setLoading(true);
         setError(null);
         const response = await axiosInstance.get<ApiResponse<IPost[]>>("/posts", {
-          params: { type: "BLOOD_FINDING", limit: 3, sortBy: "createdAt", sortOrder: "desc" },
+          params: { type: "BLOOD_FINDING", limit: 4, sortBy: "createdAt", sortOrder: "desc" },
         });
         setPosts(response.data.data);
       } catch {
@@ -125,7 +125,7 @@ export default function EmergencyRequests() {
 
         {/* Posts Grid */}
         {!loading && !error && posts.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {posts.map((post) => (
               <Card
                 key={post.id}
